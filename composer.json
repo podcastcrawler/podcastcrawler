@@ -1,0 +1,11 @@
+{
+    "name": "officercast/api",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dorian Neto",
+            "email": "doriansampaioneto@gmail.com"
+        }
+    ],
+    "require": {}
+}
