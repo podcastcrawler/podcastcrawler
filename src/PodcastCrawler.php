@@ -5,19 +5,24 @@ namespace PodcastCrawler;
 class PodcastCrawler
 {
     /**
-     * @var string $urlToSearch URL to search for podcasts
+     * @var string $defaultQueryString
      */
-    private $urlToSearch = null;
+    private $defaultQueryString = null;
 
     /**
-     * @var string BASE_URL
+     * @var string SEARCH_URL
      */
-    const BASE_URL = "https://itunes.apple.com/search";
+    const SEARCH_URL = "https://itunes.apple.com/search";
+
+    /**
+     * @var string LOOKUP_URL
+     */
+    const LOOKUP_URL = "https://itunes.apple.com/lookup";
 
     /**
      * @var int LIMIT The number of search results you want the iTunes Store to return
      */
-    const LIMIT = 10;
+    const LIMIT = 15;
 
     /**
      * @var string ENTITY The type of results you want returned, relative to the specified media type
@@ -30,28 +35,26 @@ class PodcastCrawler
     const MEDIA = "podcast";
 
     /**
-     * @param string $term The URL-encoded text string you want to search for
      * @return void
      */
-    public function __construct($term)
+    public function __construct()
     {
-        $query_string = http_build_query([
-            'term'      => $term,
+        $this->defaultQueryString = http_build_query([
             'limit'     => self::LIMIT,
             'entity'    => self::ENTITY,
             'media'     => self::MEDIA
         ]);
-        $this->urlToSearch = self::BASE_URL . '?' . $query_string;
     }
 
     /**
      * Return the list of podcasts sought by the term
+     * @param string $term The URL-encoded text string you want to search for
      * @return array
      */
-    public function getList()
+    public function getList($term)
     {
-        $result = $this->downloadPage($this->urlToSearch);
-        return json_decode($result, true);
+        $to_search = urldecode(self::SEARCH_URL . '?' . $this->defaultQueryString . '&term=' . $term);
+        return $this->downloadPage($to_search);
     }
 
     /**
@@ -78,6 +81,30 @@ class PodcastCrawler
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        return $http_code == 200 ? $result : null;
+        return $this->responseJson($result, $http_code);
+    }
+
+    /**
+     * Response the data in json format
+     * @param string $data
+     * @param int $httpCode
+     * @return json
+     */
+    private function responseJson($data, $httpCode)
+    {
+        header_remove();
+        http_response_code($httpCode);
+
+        $status = [
+            200 => '200 OK',
+            400 => '400 Bad Request',
+            500 => '500 Internal Server Error'
+        ];
+
+        header("Cache-Control: no-transform,public,max-age=300,s-maxage=900");
+        header('Content-Type: application/json; charset=utf-8');
+        header('Status: ' . $status[$httpCode]);
+
+        return $data;
     }
 }
