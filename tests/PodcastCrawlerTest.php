@@ -8,9 +8,9 @@ use PodcastCrawler\PodcastCrawler;
 class PodcastCrawlerTest extends PHPUnit
 {
     /**
-     * @var array $list
+     * @var object $instance
      */
-    private $list;
+    private $instance;
 
     /**
      * @var string TERM
@@ -18,34 +18,84 @@ class PodcastCrawlerTest extends PHPUnit
     const TERM = 'jovem';
 
     /**
+     * @var int ID
+     */
+    const ID = 381816509;
+
+    /**
      * Set up the tests
      */
     public function setUp()
     {
-        $instance = new PodcastCrawler();
-        $this->list = json_decode($instance->getList(self::TERM), true);
+        $this->instance = new PodcastCrawler();
     }
 
     /**
      * Test to validate the return of the list sought by the term
      * @runInSeparateProcess
      */
-    public function testList()
+    public function testListByTerm()
     {
-        $this->assertInternalType('array', $this->list);
-        $this->assertArrayHasKey('resultCount', $this->list);
-        $this->assertArrayHasKey('results', $this->list);
+        $list = $this->instance->getList(self::TERM);
+        $list_decoded = json_decode($list, true);
+
+        $this->assertInternalType('string', $list);
+        $this->assertInternalType('string', self::TERM);
+        $this->assertInternalType('array', $list_decoded);
+        $this->assertArrayHasKey('resultCount', $list_decoded);
+        $this->assertArrayHasKey('results', $list_decoded);
     }
 
     /**
-     * Test to validate the return of the fields in the list
+     * Test to validate the return of the fields in the list sought by the term
      * @runInSeparateProcess
      */
-    public function testListFields()
+    public function testListFieldsByTerm()
     {
-        $this->assertGreaterThanOrEqual(0, $this->list['resultCount']);
+        $list = json_decode($this->instance->getList(self::TERM), true);
 
-        foreach ($this->list['results'] as $item) {
+        $this->assertGreaterThanOrEqual(0, $list['resultCount']);
+
+        foreach ($list['results'] as $item) {
+            $this->assertArrayHasKey('feedUrl', $item);
+            $this->assertArrayHasKey('artistName', $item);
+            $this->assertArrayHasKey('collectionName', $item);
+            $this->assertArrayHasKey('collectionId', $item);
+            $this->assertArrayHasKey('collectionViewUrl', $item);
+            $this->assertArrayHasKey('artworkUrl100', $item);
+            $this->assertArrayHasKey('artworkUrl600', $item);
+            $this->assertArrayHasKey('country', $item);
+            $this->assertArrayHasKey('primaryGenreName', $item);
+        }
+    }
+
+    /**
+     * Test to validate the return of the list sought by the id
+     * @runInSeparateProcess
+     */
+    public function testListById()
+    {
+        $list = $this->instance->getList(self::ID);
+        $list_decoded = json_decode($list, true);
+
+        $this->assertInternalType('string', $list);
+        $this->assertInternalType('int', self::ID);
+        $this->assertInternalType('array', $list_decoded);
+        $this->assertArrayHasKey('resultCount', $list_decoded);
+        $this->assertArrayHasKey('results', $list_decoded);
+    }
+
+    /**
+     * Test to validate the return of the fields in the list sought by the id
+     * @runInSeparateProcess
+     */
+    public function testListFieldsById()
+    {
+        $list = json_decode($this->instance->getList(self::ID), true);
+
+        $this->assertGreaterThanOrEqual(0, $list['resultCount']);
+
+        foreach ($list['results'] as $item) {
             $this->assertArrayHasKey('feedUrl', $item);
             $this->assertArrayHasKey('artistName', $item);
             $this->assertArrayHasKey('collectionName', $item);
