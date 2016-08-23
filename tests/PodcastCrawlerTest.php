@@ -8,44 +8,49 @@ use PodcastCrawler\PodcastCrawler;
 class PodcastCrawlerTest extends PHPUnit
 {
     /**
-     * Object tested
-     * @var object
+     * @var array $list
      */
-    private $instance;
+    private $list;
+
+    /**
+     * @var string TERM
+     */
+    const TERM = 'jovem';
 
     /**
      * Set up the tests
      */
     public function setUp()
     {
-        $this->instance = new PodcastCrawler('jovem');
+        $instance = new PodcastCrawler();
+        $this->list = json_decode($instance->getList(self::TERM), true);
     }
 
     /**
      * Test to validate the return of the list sought by the term
+     * @runInSeparateProcess
      */
     public function testList()
     {
-        $list = $this->instance->getList();
-
-        $this->assertInternalType('array', $list);
-        $this->assertArrayHasKey('resultCount', $list);
-        $this->assertArrayHasKey('results', $list);
+        $this->assertInternalType('array', $this->list);
+        $this->assertArrayHasKey('resultCount', $this->list);
+        $this->assertArrayHasKey('results', $this->list);
     }
 
     /**
      * Test to validate the return of the fields in the list
+     * @runInSeparateProcess
      */
     public function testListFields()
     {
-        $list = $this->instance->getList();
+        $this->assertGreaterThanOrEqual(0, $this->list['resultCount']);
 
-        $this->assertGreaterThanOrEqual(0, $list['resultCount']);
-
-        foreach ($list['results'] as $item) {
+        foreach ($this->list['results'] as $item) {
             $this->assertArrayHasKey('feedUrl', $item);
             $this->assertArrayHasKey('artistName', $item);
             $this->assertArrayHasKey('collectionName', $item);
+            $this->assertArrayHasKey('collectionId', $item);
+            $this->assertArrayHasKey('collectionViewUrl', $item);
             $this->assertArrayHasKey('artworkUrl100', $item);
             $this->assertArrayHasKey('artworkUrl600', $item);
             $this->assertArrayHasKey('country', $item);
