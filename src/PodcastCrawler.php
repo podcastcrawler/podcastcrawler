@@ -47,24 +47,24 @@ class PodcastCrawler
     }
 
     /**
-     * Return the list of podcasts sought by the term
+     * Return the podcasts found sought by the term (string) or ID (int)
      * @param string|int $value The URL-encoded text string or id int you want to search for
      * @return string
      */
-    public function getList($value)
+    public function search($value)
     {
         $value     = is_int($value) ? self::LOOKUP_URL . "?id={$value}" : self::SEARCH_URL . "?term={$value}";
         $to_search = urldecode($value . '&' . $this->defaultQueryString);
-        return $this->downloadPage($to_search);
+        return $this->request($to_search);
     }
 
     /**
-     * Send a http request and return the response with list podcasts
+     * Send a http request and return the response
      * @param string $url
      * @param array $options CURL options
      * @return string
      */
-    private function downloadPage($url, array $options = [])
+    private function request($url, array $options = [])
     {
         $ch = curl_init($url);
 
