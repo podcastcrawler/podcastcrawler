@@ -36,7 +36,7 @@ class PodcastCrawlerTest extends PHPUnit
      */
     public function testListByTerm()
     {
-        $list = $this->instance->getList(self::TERM);
+        $list = $this->instance->search(self::TERM);
         $list_decoded = json_decode($list, true);
 
         $this->assertInternalType('string', $list);
@@ -52,7 +52,7 @@ class PodcastCrawlerTest extends PHPUnit
      */
     public function testListFieldsByTerm()
     {
-        $list = json_decode($this->instance->getList(self::TERM), true);
+        $list = json_decode($this->instance->search(self::TERM), true);
 
         $this->assertGreaterThanOrEqual(0, $list['resultCount']);
 
@@ -75,7 +75,7 @@ class PodcastCrawlerTest extends PHPUnit
      */
     public function testListById()
     {
-        $list = $this->instance->getList(self::ID);
+        $list = $this->instance->search(self::ID);
         $list_decoded = json_decode($list, true);
 
         $this->assertInternalType('string', $list);
@@ -91,7 +91,7 @@ class PodcastCrawlerTest extends PHPUnit
      */
     public function testListFieldsById()
     {
-        $list = json_decode($this->instance->getList(self::ID), true);
+        $list = json_decode($this->instance->search(self::ID), true);
 
         $this->assertGreaterThanOrEqual(0, $list['resultCount']);
 
