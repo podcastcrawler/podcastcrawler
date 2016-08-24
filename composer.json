@@ -1,6 +1,9 @@
 {
     "name": "podcastcrawler/podcastcrawler",
     "version": "0.7.0-alpha",
+    "type": "library",
+    "description": "PHP library to find podcasts",
+    "keywords": ["framework", "rest", "api", "itunes", "mp3", "podcast", "library"],
     "license": "MIT",
     "authors": [
         {
@@ -8,7 +11,9 @@
             "email": "doriansampaioneto@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "php": ">=5.4"
+    },
     "require-dev": {
         "phpunit/phpunit": "^4.8"
     },
