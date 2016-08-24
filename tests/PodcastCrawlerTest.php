@@ -28,6 +28,7 @@ class PodcastCrawlerTest extends PHPUnit
     public function setUp()
     {
         $this->instance = new PodcastCrawler();
+        $this->instance->responseJson = true;
     }
 
     /**
