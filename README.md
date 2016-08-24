@@ -1,5 +1,9 @@
 #Podcast Crawler
 [![Build Status](https://travis-ci.org/podcastcrawler/podcastcrawler.svg?branch=master)](https://travis-ci.org/podcastcrawler/podcastcrawler)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7823d6165f3244f196c5df469b3be5d6)](https://www.codacy.com/app/doriansampaioneto/podcastcrawler?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=podcastcrawler/podcastcrawler&amp;utm_campaign=Badge_Grade)
+[![Packagist](https://img.shields.io/packagist/v/podcastcrawler/podcastcrawler.svg?maxAge=2592000)](https://packagist.org/packages/podcastcrawler/podcastcrawler)
+[![Packagist](https://img.shields.io/packagist/dt/podcastcrawler/podcastcrawler.svg?maxAge=2592000)](https://packagist.org/packages/podcastcrawler/podcastcrawler)
+[![Packagist](https://img.shields.io/packagist/l/podcastcrawler/podcastcrawler.svg?maxAge=2592000)](https://packagist.org/packages/podcastcrawler/podcastcrawler)
 
 Podcast Crawler it is a library that enables the search for podcasts to get details and mp3 files through Itunes API.
 
