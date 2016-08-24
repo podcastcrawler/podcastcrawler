@@ -2,12 +2,22 @@
 
 namespace PodcastCrawler;
 
+use SimpleXMLElement;
+use Tidy;
+use DateTime;
+use Exception;
+
 class PodcastCrawler
 {
     /**
      * @var string $defaultQueryString
      */
     private $defaultQueryString = null;
+
+    /**
+     * @var int $requestHttpCode
+     */
+    private $requestHttpCode = null;
 
     /**
      * @var string SEARCH_URL
@@ -53,9 +63,125 @@ class PodcastCrawler
      */
     public function search($value)
     {
-        $value     = is_int($value) ? self::LOOKUP_URL . "?id={$value}" : self::SEARCH_URL . "?term={$value}";
-        $to_search = urldecode($value . '&' . $this->defaultQueryString);
-        return $this->request($to_search);
+        $url       = is_int($value) ? self::LOOKUP_URL . "?id={$value}" : self::SEARCH_URL . "?term={$value}";
+        $to_search = urldecode($url . '&' . $this->defaultQueryString);
+        $result    = $this->request($to_search);
+
+        return $this->responseJson($result, $this->requestHttpCode);
+    }
+
+    /**
+     * Return the podcast details found sought by ID (int)
+     * @param int $id The podcast id int you want to details
+     * @return string
+     */
+    public function feed($id)
+    {
+        try {
+            // Request the Itunes API
+            $url       = self::LOOKUP_URL . "?id={$id}";
+            $to_search = urldecode($url . '&' . $this->defaultQueryString);
+            $result    = $this->request($to_search);
+
+            if (is_null($result)) {
+                throw new Exception("Request to Itunes API failed");
+            }
+
+            // Result of request Itunes API
+            $result = json_decode($result);
+
+            if (!isset($result->results[0])) {
+                throw new Exception("Data response by Itunes are inconsistent");
+            }
+
+            // Request the RSS
+            $item = $result->results[0];
+            $download_feed = $this->request($item->feedUrl);
+
+            if (is_null($download_feed)) {
+                throw new Exception("Request to RSS failed");
+            }
+        } catch (Exception $except) {
+            $response = [
+                'code'    => $this->requestHttpCode,
+                'message' => $except->getMessage()
+            ];
+
+            return $this->responseJson(json_encode($response), $this->requestHttpCode);
+        }
+
+        libxml_use_internal_errors(true);
+
+        try {
+            $feed = new SimpleXMLElement($download_feed, LIBXML_NOCDATA, false);
+        } catch (Exception $except) {
+            $download_feed = $this->repairXml($download_feed);
+            $feed          = new SimpleXMLElement($download_feed, LIBXML_NOCDATA, false);
+        }
+
+        $response = [
+            'itunes_id'   => $item->collectionId,
+            'title'       => (string) $feed->channel->title,
+            'description' => (string) $feed->channel->description,
+            'image'       => (string) $feed->channel->image->url,
+            'links'       => [
+                'site'   => (string) $feed->channel->link,
+                'rss'    => $item->feedUrl,
+                'itunes' => $item->collectionViewUrl
+            ],
+            'genre'       => $item->primaryGenreName,
+            'language'    => (string) $feed->channel->language,
+            'episodes'    => (int) count($feed->channel->item)
+        ];
+
+        foreach($feed->channel->item as $entry) {
+            $published_at = new DateTime($entry->pubDate);
+            $published_at = $published_at->format('Y-m-d');
+
+            $response['mp3'][] = [
+                'title'        => (string) $entry->title,
+                'mp3'          => isset($entry->enclosure) ? (string) $entry->enclosure->attributes()->url : null,
+                'description'  => (string) $entry->description,
+                'link'         => (string) $entry->link,
+                'published_at' => $published_at,
+            ];
+        }
+
+        return $this->responseJson(json_encode($response), $this->requestHttpCode);
+    }
+
+    /**
+     * Return the http status code
+     * @return int
+     */
+    public function getStatusCode()
+    {
+        return $this->requestHttpCode;
+    }
+
+    /**
+     * Repair a XML string with failures in structure
+     * @param string $xml XML string
+     * @return string XML repaired
+     */
+    private function repairXml($xml)
+    {
+        $config = [
+            'indent'     => true,
+            'input-xml'  => true,
+            'output-xml' => true,
+            'wrap'       => false
+        ];
+
+        if (class_exists('Tidy') === false) {
+            throw new Exception("Not possible to repair the XML because the class Tidy It was not found");
+        }
+
+        $xml_repaired = new Tidy();
+        $xml_repaired->ParseString($xml, $config, 'utf8');
+        $xml_repaired->cleanRepair();
+
+        return $xml_repaired;
     }
 
     /**
@@ -79,11 +205,11 @@ class PodcastCrawler
 
         curl_setopt_array($ch, $default_options);
 
-        $result    = curl_exec($ch);
-        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $result = curl_exec($ch);
+        $this->requestHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        return $this->responseJson($result, $http_code);
+        return $result;
     }
 
     /**
