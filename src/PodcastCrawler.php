@@ -3,9 +3,9 @@
 namespace PodcastCrawler;
 
 use SimpleXMLElement;
-use Tidy;
 use DateTime;
 use Exception;
+use Tidy;
 
 class PodcastCrawler
 {
@@ -63,11 +63,38 @@ class PodcastCrawler
      */
     public function search($value)
     {
-        $url       = is_int($value) ? self::LOOKUP_URL . "?id={$value}" : self::SEARCH_URL . "?term={$value}";
-        $to_search = urldecode($url . '&' . $this->defaultQueryString);
-        $result    = $this->request($to_search);
+        try {
+            // Request the Itunes API
+            $url       = is_int($value) ? self::LOOKUP_URL . "?id={$value}" : self::SEARCH_URL . "?term={$value}";
+            $to_search = urldecode($url . '&' . $this->defaultQueryString);
+            $result    = $this->request($to_search);
 
-        return $this->responseJson($result, $this->requestHttpCode);
+            if (is_null($result)) {
+                throw new Exception("Request to Itunes API failed");
+            }
+
+            $result   = json_decode($result);
+            $response['result_count'] = $result->resultCount;
+
+            foreach($result->results as $value) {
+                $response['podcasts'][] = [
+                    'itunes_id' => $value->collectionId,
+                    'author'    => $value->artistName,
+                    'title'     => $value->collectionName,
+                    'episodes'  => $value->trackCount,
+                    'image'     => $value->artworkUrl100,
+                    'rss'       => $value->feedUrl,
+                    'genre'     => $value->primaryGenreName,
+                ];
+            }
+        } catch (Exception $except) {
+            $response = [
+                'code'    => $this->requestHttpCode,
+                'message' => $except->getMessage()
+            ];
+        }
+
+        return $this->responseJson(json_encode($response), $this->requestHttpCode);
     }
 
     /**
@@ -172,10 +199,6 @@ class PodcastCrawler
             'output-xml' => true,
             'wrap'       => false
         ];
-
-        if (class_exists('Tidy') === false) {
-            throw new Exception("Not possible to repair the XML because the class Tidy It was not found");
-        }
 
         $xml_repaired = new Tidy();
         $xml_repaired->ParseString($xml, $config, 'utf8');
