@@ -20,6 +20,11 @@ class PodcastCrawler
     private $requestHttpCode = null;
 
     /**
+     * @var boolean $responseJson
+     */
+    public $responseJson = false;
+
+    /**
      * @var string SEARCH_URL
      */
     const SEARCH_URL = "https://itunes.apple.com/search";
@@ -59,7 +64,7 @@ class PodcastCrawler
     /**
      * Return the podcasts found sought by the term (string) or ID (int)
      * @param string|int $value The URL-encoded text string or id int you want to search for
-     * @return string
+     * @return string|array
      */
     public function search($value)
     {
@@ -94,13 +99,17 @@ class PodcastCrawler
             ];
         }
 
+        if ($this->responseJson === false) {
+            return $response;
+        }
+
         return $this->responseJson(json_encode($response), $this->requestHttpCode);
     }
 
     /**
      * Return the podcast details found sought by ID (int)
      * @param int $id The podcast id int you want to details
-     * @return string
+     * @return string|array
      */
     public function feed($id)
     {
@@ -172,6 +181,10 @@ class PodcastCrawler
                 'link'         => (string) $entry->link,
                 'published_at' => $published_at,
             ];
+        }
+
+        if ($this->responseJson === false) {
+            return $response;
         }
 
         return $this->responseJson(json_encode($response), $this->requestHttpCode);
