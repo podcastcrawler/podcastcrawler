@@ -40,11 +40,10 @@ class PodcastCrawlerTest extends PHPUnit
         $list_decoded = json_decode($list, true);
 
         $this->assertInternalType('string', $list);
-        $this->assertInternalType('string', self::TERM);
         $this->assertInternalType('array', $list_decoded);
-        $this->assertArrayHasKey('resultCount', $list_decoded);
-        $this->assertArrayHasKey('results', $list_decoded);
         $this->assertEquals(200, $this->instance->getStatusCode());
+        $this->assertArrayHasKey('result_count', $list_decoded);
+        $this->assertArrayHasKey('podcasts', $list_decoded);
     }
 
     /**
@@ -55,56 +54,53 @@ class PodcastCrawlerTest extends PHPUnit
     {
         $list = json_decode($this->instance->search(self::TERM), true);
 
-        $this->assertGreaterThanOrEqual(0, $list['resultCount']);
+        $this->assertGreaterThanOrEqual(0, $list['result_count']);
 
-        foreach ($list['results'] as $item) {
-            $this->assertArrayHasKey('feedUrl', $item);
-            $this->assertArrayHasKey('artistName', $item);
-            $this->assertArrayHasKey('collectionName', $item);
-            $this->assertArrayHasKey('collectionId', $item);
-            $this->assertArrayHasKey('collectionViewUrl', $item);
-            $this->assertArrayHasKey('artworkUrl100', $item);
-            $this->assertArrayHasKey('artworkUrl600', $item);
-            $this->assertArrayHasKey('country', $item);
-            $this->assertArrayHasKey('primaryGenreName', $item);
+        foreach ($list['podcasts'] as $item) {
+            $this->assertArrayHasKey('itunes_id', $item);
+            $this->assertArrayHasKey('author', $item);
+            $this->assertArrayHasKey('title', $item);
+            $this->assertArrayHasKey('episodes', $item);
+            $this->assertArrayHasKey('image', $item);
+            $this->assertArrayHasKey('rss', $item);
+            $this->assertArrayHasKey('genre', $item);
         }
     }
 
     /**
-     * Test to validate the return of the list sought by the id
+     * Test to validate the return of the list sought by the ID
      * @runInSeparateProcess
      */
-    public function testListById()
+    public function testListByID()
     {
         $list = $this->instance->search(self::ID);
         $list_decoded = json_decode($list, true);
 
         $this->assertInternalType('string', $list);
         $this->assertInternalType('array', $list_decoded);
-        $this->assertArrayHasKey('resultCount', $list_decoded);
-        $this->assertArrayHasKey('results', $list_decoded);
+        $this->assertEquals(200, $this->instance->getStatusCode());
+        $this->assertArrayHasKey('result_count', $list_decoded);
+        $this->assertArrayHasKey('podcasts', $list_decoded);
     }
 
     /**
-     * Test to validate the return of the fields in the list sought by the id
+     * Test to validate the return of the fields in the list sought by the ID
      * @runInSeparateProcess
      */
-    public function testListFieldsById()
+    public function testListFieldsByID()
     {
-        $list = json_decode($this->instance->search(self::ID), true);
+        $list = json_decode($this->instance->search(self::TERM), true);
 
-        $this->assertGreaterThanOrEqual(0, $list['resultCount']);
+        $this->assertGreaterThanOrEqual(0, $list['result_count']);
 
-        foreach ($list['results'] as $item) {
-            $this->assertArrayHasKey('feedUrl', $item);
-            $this->assertArrayHasKey('artistName', $item);
-            $this->assertArrayHasKey('collectionName', $item);
-            $this->assertArrayHasKey('collectionId', $item);
-            $this->assertArrayHasKey('collectionViewUrl', $item);
-            $this->assertArrayHasKey('artworkUrl100', $item);
-            $this->assertArrayHasKey('artworkUrl600', $item);
-            $this->assertArrayHasKey('country', $item);
-            $this->assertArrayHasKey('primaryGenreName', $item);
+        foreach ($list['podcasts'] as $item) {
+            $this->assertArrayHasKey('itunes_id', $item);
+            $this->assertArrayHasKey('author', $item);
+            $this->assertArrayHasKey('title', $item);
+            $this->assertArrayHasKey('episodes', $item);
+            $this->assertArrayHasKey('image', $item);
+            $this->assertArrayHasKey('rss', $item);
+            $this->assertArrayHasKey('genre', $item);
         }
     }
 
