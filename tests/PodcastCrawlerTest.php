@@ -2,25 +2,15 @@
 
 namespace PodcastCrawler\Tests;
 
-use PHPUnit_Framework_TestCase as PHPUnit;
+use PodcastCrawler\Tests\PodcastCrawlerBaseTest as Base;
 use PodcastCrawler\PodcastCrawler;
 
-class PodcastCrawlerTest extends PHPUnit
+class PodcastCrawlerTest extends Base
 {
-    /**
-     * @var string TERM
-     */
-    const TERM = 'jovem';
-
-    /**
-     * @var int ID
-     */
-    const ID = 381816509;
-
     /**
      * @var object $instance
      */
-    private $instance;
+    protected $instance;
 
     /**
      * Set up the tests
@@ -31,109 +21,90 @@ class PodcastCrawlerTest extends PHPUnit
     }
 
     /**
-     * Test to validate the return of the list sought by the term
-     * @runInSeparateProcess
+     * Test to validate the return of the search sought by the term
      */
-    public function testListByTerm()
+    public function testSearch($value = null)
     {
-        $list = $this->instance->search(self::TERM);
+        $value  = empty($value) ? self::TERM : $value;
+        $result = $this->instance->search($value);
 
-        $this->assertEquals(200, $this->instance->getStatusCode());
-        $this->assertInternalType('array', $list);
-        $this->assertArrayHasKey('result_count', $list);
-        $this->assertArrayHasKey('podcasts', $list);
+        $this->assertInternalType('array', $result);
+        $this->assertArrayHasKey('result_count', $result);
+        $this->assertArrayHasKey('podcasts', $result);
     }
 
     /**
-     * Test to validate the return of the fields in the list sought by the term
-     * @runInSeparateProcess
+     * Test to validate the return of the fields in the search sought by the term
      */
-    public function testListFieldsByTerm()
+    public function testSearchValues($value = null)
     {
-        $list = $this->instance->search(self::TERM);
+        $value  = empty($value) ? self::TERM : $value;
+        $result = $this->instance->search($value);
 
-        foreach ($list['podcasts'] as $item) {
-            $this->assertArrayHasKey('itunes_id', $item);
-            $this->assertArrayHasKey('author', $item);
-            $this->assertArrayHasKey('title', $item);
-            $this->assertArrayHasKey('episodes', $item);
-            $this->assertArrayHasKey('image', $item);
-            $this->assertArrayHasKey('rss', $item);
-            $this->assertArrayHasKey('genre', $item);
+        foreach ($result['podcasts'] as $podcast) {
+            $this->assertArrayHasKey('itunes_id', $podcast);
+            $this->assertArrayHasKey('author', $podcast);
+            $this->assertArrayHasKey('title', $podcast);
+            $this->assertArrayHasKey('episodes', $podcast);
+            $this->assertArrayHasKey('image', $podcast);
+            $this->assertArrayHasKey('rss', $podcast);
+            $this->assertArrayHasKey('genre', $podcast);
         }
     }
 
     /**
-     * Test to validate the return of the list sought by the ID
-     * @runInSeparateProcess
+     * Test to validate the return of the search sought by the ID
      */
-    public function testListByID()
+    public function testSearchByID()
     {
-        $list = $this->instance->search(self::ID);
-
-        $this->assertEquals(200, $this->instance->getStatusCode());
-        $this->assertInternalType('array', $list);
-        $this->assertArrayHasKey('result_count', $list);
-        $this->assertArrayHasKey('podcasts', $list);
+        $this->testSearch(self::ID);
     }
 
     /**
-     * Test to validate the return of the fields in the list sought by the ID
-     * @runInSeparateProcess
+     * Test to validate the return of the fields in the search sought by the ID
      */
-    public function testListFieldsByID()
+    public function testSearchValuesByID()
     {
-        $list = $this->instance->search(self::ID);
-
-        foreach ($list['podcasts'] as $item) {
-            $this->assertArrayHasKey('itunes_id', $item);
-            $this->assertArrayHasKey('author', $item);
-            $this->assertArrayHasKey('title', $item);
-            $this->assertArrayHasKey('episodes', $item);
-            $this->assertArrayHasKey('image', $item);
-            $this->assertArrayHasKey('rss', $item);
-            $this->assertArrayHasKey('genre', $item);
-        }
+        $this->testSearchValues(self::ID);
     }
 
     /**
-     * Test to validate the return of the feed sought by the id
-     * @runInSeparateProcess
+     * Test to validate the return of the feed sought by the ID
      */
     public function testFeed()
     {
-        $list = $this->instance->feed(self::ID);
+        $result = $this->instance->feed(self::ID);
 
-        $this->assertEquals(200, $this->instance->getStatusCode());
-        $this->assertInternalType('array', $list);
-        $this->assertArrayHasKey('itunes_id', $list);
-        $this->assertArrayHasKey('title', $list);
-        $this->assertArrayHasKey('description', $list);
-        $this->assertArrayHasKey('image', $list);
-        $this->assertInternalType('array', $list['links']);
-        $this->assertArrayHasKey('links', $list);
-        $this->assertArrayHasKey('site', $list['links']);
-        $this->assertArrayHasKey('rss', $list['links']);
-        $this->assertArrayHasKey('itunes', $list['links']);
-        $this->assertArrayHasKey('genre', $list);
-        $this->assertArrayHasKey('language', $list);
-        $this->assertArrayHasKey('episodes', $list);
+        $this->assertInternalType('array', $result);
+        $this->assertArrayHasKey('itunes_id', $result);
+        $this->assertArrayHasKey('title', $result);
+        $this->assertArrayHasKey('description', $result);
+        $this->assertArrayHasKey('image', $result);
+        $this->assertArrayHasKey('links', $result);
+        $this->assertInternalType('array', $result['links']);
+        $this->assertArrayHasKey('site', $result['links']);
+        $this->assertArrayHasKey('rss', $result['links']);
+        $this->assertArrayHasKey('itunes', $result['links']);
+        $this->assertArrayHasKey('genre', $result);
+        $this->assertArrayHasKey('language', $result);
+        $this->assertArrayHasKey('episodes_total', $result);
+        $this->assertArrayHasKey('episodes', $result);
+        $this->assertInternalType('array', $result['episodes']);
     }
 
     /**
-     * Test to validate the return of the fields in the feed sought by the id
-     * @runInSeparateProcess
+     * Test to validate the return of the fields in the feed sought by the ID
      */
-    public function testFeedMp3Fields()
+    public function testFeedValues()
     {
-        $list = $this->instance->feed(self::ID);
+        $result = $this->instance->feed(self::ID);
 
-        foreach ($list['mp3'] as $item) {
-            $this->assertArrayHasKey('title', $item);
-            $this->assertArrayHasKey('mp3', $item);
-            $this->assertArrayHasKey('description', $item);
-            $this->assertArrayHasKey('link', $item);
-            $this->assertArrayHasKey('published_at', $item);
+        foreach ($result['episodes'] as $episode) {
+            $this->assertArrayHasKey('title', $episode);
+            $this->assertArrayHasKey('mp3', $episode);
+            $this->assertArrayHasKey('description', $episode);
+            $this->assertArrayHasKey('link', $episode);
+            $this->assertArrayHasKey('published_at', $episode);
         }
     }
 }
