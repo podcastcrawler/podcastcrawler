@@ -57,9 +57,9 @@ class PodcastCrawler
     }
 
     /**
-     * Return the podcasts found sought by the term (string) or ID (int)
-     * @param string|int $value The URL-encoded text string or id int you want to search for
-     * @return string|array
+     * Return the podcasts found sought by the term or Collection ID
+     * @param string|int $value The URL-encoded text string or ID int you want to search for
+     * @return array
      */
     public function search($value)
     {
@@ -98,9 +98,9 @@ class PodcastCrawler
     }
 
     /**
-     * Return the podcast details found sought by ID (int)
+     * Return the podcast details found sought by Collection ID
      * @param int $id The podcast id int you want to details
-     * @return string|array
+     * @return array
      */
     public function feed($id)
     {
