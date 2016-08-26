@@ -21,5 +21,10 @@
         "psr-4": {
             "PodcastCrawler\\": "src/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PodcastCrawler\\Tests\\": "tests/"
+        }
     }
 }
