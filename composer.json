@@ -1,6 +1,6 @@
 {
     "name": "podcastcrawler/podcastcrawler",
-    "version": "0.8.0-alpha",
+    "version": "0.15.1-beta",
     "type": "library",
     "description": "PHP library to find podcasts",
     "keywords": ["framework", "rest", "api", "itunes", "mp3", "podcast", "library"],
