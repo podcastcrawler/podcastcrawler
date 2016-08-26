@@ -8,11 +8,6 @@ use PodcastCrawler\PodcastCrawler;
 class PodcastCrawlerTest extends PHPUnit
 {
     /**
-     * @var object $instance
-     */
-    private $instance;
-
-    /**
      * @var string TERM
      */
     const TERM = 'jovem';
@@ -23,12 +18,16 @@ class PodcastCrawlerTest extends PHPUnit
     const ID = 381816509;
 
     /**
+     * @var object $instance
+     */
+    private $instance;
+
+    /**
      * Set up the tests
      */
     public function setUp()
     {
         $this->instance = new PodcastCrawler();
-        $this->instance->responseJson = true;
     }
 
     /**
@@ -38,13 +37,11 @@ class PodcastCrawlerTest extends PHPUnit
     public function testListByTerm()
     {
         $list = $this->instance->search(self::TERM);
-        $list_decoded = json_decode($list, true);
 
-        $this->assertInternalType('string', $list);
-        $this->assertInternalType('array', $list_decoded);
         $this->assertEquals(200, $this->instance->getStatusCode());
-        $this->assertArrayHasKey('result_count', $list_decoded);
-        $this->assertArrayHasKey('podcasts', $list_decoded);
+        $this->assertInternalType('array', $list);
+        $this->assertArrayHasKey('result_count', $list);
+        $this->assertArrayHasKey('podcasts', $list);
     }
 
     /**
@@ -53,9 +50,7 @@ class PodcastCrawlerTest extends PHPUnit
      */
     public function testListFieldsByTerm()
     {
-        $list = json_decode($this->instance->search(self::TERM), true);
-
-        $this->assertGreaterThanOrEqual(0, $list['result_count']);
+        $list = $this->instance->search(self::TERM);
 
         foreach ($list['podcasts'] as $item) {
             $this->assertArrayHasKey('itunes_id', $item);
@@ -75,13 +70,11 @@ class PodcastCrawlerTest extends PHPUnit
     public function testListByID()
     {
         $list = $this->instance->search(self::ID);
-        $list_decoded = json_decode($list, true);
 
-        $this->assertInternalType('string', $list);
-        $this->assertInternalType('array', $list_decoded);
         $this->assertEquals(200, $this->instance->getStatusCode());
-        $this->assertArrayHasKey('result_count', $list_decoded);
-        $this->assertArrayHasKey('podcasts', $list_decoded);
+        $this->assertInternalType('array', $list);
+        $this->assertArrayHasKey('result_count', $list);
+        $this->assertArrayHasKey('podcasts', $list);
     }
 
     /**
@@ -90,9 +83,7 @@ class PodcastCrawlerTest extends PHPUnit
      */
     public function testListFieldsByID()
     {
-        $list = json_decode($this->instance->search(self::TERM), true);
-
-        $this->assertGreaterThanOrEqual(0, $list['result_count']);
+        $list = $this->instance->search(self::ID);
 
         foreach ($list['podcasts'] as $item) {
             $this->assertArrayHasKey('itunes_id', $item);
@@ -112,23 +103,21 @@ class PodcastCrawlerTest extends PHPUnit
     public function testFeed()
     {
         $list = $this->instance->feed(self::ID);
-        $list_decoded = json_decode($list, true);
 
-        $this->assertInternalType('string', $list);
-        $this->assertInternalType('array', $list_decoded);
         $this->assertEquals(200, $this->instance->getStatusCode());
-        $this->assertArrayHasKey('itunes_id', $list_decoded);
-        $this->assertArrayHasKey('title', $list_decoded);
-        $this->assertArrayHasKey('description', $list_decoded);
-        $this->assertArrayHasKey('image', $list_decoded);
-        $this->assertInternalType('array', $list_decoded['links']);
-        $this->assertArrayHasKey('links', $list_decoded);
-        $this->assertArrayHasKey('site', $list_decoded['links']);
-        $this->assertArrayHasKey('rss', $list_decoded['links']);
-        $this->assertArrayHasKey('itunes', $list_decoded['links']);
-        $this->assertArrayHasKey('genre', $list_decoded);
-        $this->assertArrayHasKey('language', $list_decoded);
-        $this->assertArrayHasKey('episodes', $list_decoded);
+        $this->assertInternalType('array', $list);
+        $this->assertArrayHasKey('itunes_id', $list);
+        $this->assertArrayHasKey('title', $list);
+        $this->assertArrayHasKey('description', $list);
+        $this->assertArrayHasKey('image', $list);
+        $this->assertInternalType('array', $list['links']);
+        $this->assertArrayHasKey('links', $list);
+        $this->assertArrayHasKey('site', $list['links']);
+        $this->assertArrayHasKey('rss', $list['links']);
+        $this->assertArrayHasKey('itunes', $list['links']);
+        $this->assertArrayHasKey('genre', $list);
+        $this->assertArrayHasKey('language', $list);
+        $this->assertArrayHasKey('episodes', $list);
     }
 
     /**
@@ -137,9 +126,7 @@ class PodcastCrawlerTest extends PHPUnit
      */
     public function testFeedMp3Fields()
     {
-        $list = json_decode($this->instance->feed(self::ID), true);
-
-        $this->assertGreaterThan(0, $list['episodes']);
+        $list = $this->instance->feed(self::ID);
 
         foreach ($list['mp3'] as $item) {
             $this->assertArrayHasKey('title', $item);
