@@ -10,21 +10,6 @@ use Tidy;
 class PodcastCrawler
 {
     /**
-     * @var string $defaultQueryString
-     */
-    private $defaultQueryString = null;
-
-    /**
-     * @var int $requestHttpCode
-     */
-    private $requestHttpCode = null;
-
-    /**
-     * @var boolean $responseJson
-     */
-    public $responseJson = false;
-
-    /**
      * @var string SEARCH_URL
      */
     const SEARCH_URL = "https://itunes.apple.com/search";
@@ -48,6 +33,16 @@ class PodcastCrawler
      * @var string MEDIA The media type you want to search for
      */
     const MEDIA = "podcast";
+
+    /**
+     * @var string $defaultQueryString
+     */
+    private $defaultQueryString = null;
+
+    /**
+     * @var int $requestHttpCode
+     */
+    private $requestHttpCode = null;
 
     /**
      * @return void
@@ -99,11 +94,7 @@ class PodcastCrawler
             ];
         }
 
-        if ($this->responseJson === false) {
-            return $response;
-        }
-
-        return $this->responseJson(json_encode($response), $this->requestHttpCode);
+        return $response;
     }
 
     /**
@@ -143,7 +134,7 @@ class PodcastCrawler
                 'message' => $except->getMessage()
             ];
 
-            return $this->responseJson(json_encode($response), $this->requestHttpCode);
+            return $response;
         }
 
         libxml_use_internal_errors(true);
@@ -183,11 +174,7 @@ class PodcastCrawler
             ];
         }
 
-        if ($this->responseJson === false) {
-            return $response;
-        }
-
-        return $this->responseJson(json_encode($response), $this->requestHttpCode);
+        return $response;
     }
 
     /**
@@ -246,29 +233,5 @@ class PodcastCrawler
         curl_close($ch);
 
         return $result;
-    }
-
-    /**
-     * Response the data in json format
-     * @param string|array $data
-     * @param int $httpCode
-     * @return string
-     */
-    private function responseJson($data, $httpCode)
-    {
-        header_remove();
-        http_response_code($httpCode);
-
-        $status = [
-            200 => '200 OK',
-            400 => '400 Bad Request',
-            500 => '500 Internal Server Error'
-        ];
-
-        header("Cache-Control: no-transform,public,max-age=300,s-maxage=900");
-        header('Content-Type: application/json; charset=utf-8');
-        header('Status: ' . $status[$httpCode]);
-
-        return $data;
     }
 }
