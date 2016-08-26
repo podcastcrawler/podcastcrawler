@@ -2,10 +2,11 @@
 
 namespace PodcastCrawler;
 
+use PodcastCrawler\Request;
+use PodcastCrawler\Helper;
 use SimpleXMLElement;
 use DateTime;
 use Exception;
-use Tidy;
 
 class PodcastCrawler
 {
@@ -35,21 +36,16 @@ class PodcastCrawler
     const MEDIA = "podcast";
 
     /**
-     * @var string $defaultQueryString
+     * @var string $defaultQuery
      */
-    private $defaultQueryString = null;
-
-    /**
-     * @var int $requestHttpCode
-     */
-    private $requestHttpCode = null;
+    private $defaultQuery = null;
 
     /**
      * @return void
      */
     public function __construct()
     {
-        $this->defaultQueryString = http_build_query([
+        $this->defaultQuery = http_build_query([
             'limit'     => self::LIMIT,
             'entity'    => self::ENTITY,
             'media'     => self::MEDIA
@@ -57,181 +53,146 @@ class PodcastCrawler
     }
 
     /**
-     * Return the podcasts found sought by the term or Collection ID
-     * @param string|int $value The URL-encoded text string or ID int you want to search for
+     * Returns the podcasts
+     * @param string|int $value The text or ID
      * @return array
      */
     public function search($value)
     {
         try {
-            // Request the Itunes API
-            $url       = is_int($value) ? self::LOOKUP_URL . "?id={$value}" : self::SEARCH_URL . "?term={$value}";
-            $to_search = urldecode($url . '&' . $this->defaultQueryString);
-            $result    = $this->request($to_search);
+            $response = $this->getSearch($value);
+            $output['result_count'] = $response['search']->resultCount;
 
-            if (is_null($result)) {
-                throw new Exception("Request to Itunes API failed");
-            }
-
-            $result   = json_decode($result);
-            $response['result_count'] = $result->resultCount;
-
-            foreach($result->results as $value) {
-                $response['podcasts'][] = [
+            foreach($response['search']->results as $value) {
+                $output['podcasts'][] = [
                     'itunes_id' => $value->collectionId,
-                    'author'    => $value->artistName,
-                    'title'     => $value->collectionName,
+                    'author'    => utf8_decode($value->artistName),
+                    'title'     => utf8_decode($value->collectionName),
                     'episodes'  => $value->trackCount,
                     'image'     => $value->artworkUrl100,
                     'rss'       => $value->feedUrl,
+                    'itunes'    => $value->collectionViewUrl,
                     'genre'     => $value->primaryGenreName,
                 ];
             }
         } catch (Exception $except) {
-            $response = [
-                'code'    => $this->requestHttpCode,
-                'message' => $except->getMessage()
+            $output = [
+                'status_code' => $except->getCode(),
+                'message'     => $except->getMessage()
             ];
         }
 
-        return $response;
+        return $output;
     }
 
     /**
-     * Return the podcast details found sought by Collection ID
-     * @param int $id The podcast id int you want to details
+     * Get podcasts sought by the term or Collection ID
+     * @param string|int $value The URL-encoded text string or ID int you want to search for
+     * @return array
+     */
+    private function getSearch($value)
+    {
+        $Request  = new Request;
+        $url      = is_int($value) ? self::LOOKUP_URL . "?id={$value}" : self::SEARCH_URL . "?term={$value}";
+        $url      = urldecode($url . '&' . $this->defaultQuery);
+        $response = $Request->request($url);
+
+        if (is_null($response)) {
+            throw new Exception("Request to Itunes API failed", $Request->getStatusCode());
+        }
+
+        $output = [
+            'search'      => json_decode($response),
+            'status_code' => $Request->getStatusCode(),
+        ];
+
+        return $output;
+    }
+
+    /**
+     * Returns the podcast details
+     * @param int $id The podcast id
      * @return array
      */
     public function feed($id)
     {
         try {
-            // Request the Itunes API
-            $url       = self::LOOKUP_URL . "?id={$id}";
-            $to_search = urldecode($url . '&' . $this->defaultQueryString);
-            $result    = $this->request($to_search);
+            $response = $this->getRss($id);
 
-            if (is_null($result)) {
-                throw new Exception("Request to Itunes API failed");
+            libxml_use_internal_errors(true);
+
+            try {
+                $feed = new SimpleXMLElement($response['feed'], LIBXML_NOCDATA, false);
+            } catch (Exception $except) {
+                $response_repaired = Helper::repairXml($response['feed']);
+                $feed              = new SimpleXMLElement($response_repaired, LIBXML_NOCDATA, false);
             }
 
-            // Result of request Itunes API
-            $result = json_decode($result);
-
-            if (!isset($result->results[0])) {
-                throw new Exception("Data response by Itunes are inconsistent");
-            }
-
-            // Request the RSS
-            $item = $result->results[0];
-            $download_feed = $this->request($item->feedUrl);
-
-            if (is_null($download_feed)) {
-                throw new Exception("Request to RSS failed");
-            }
-        } catch (Exception $except) {
-            $response = [
-                'code'    => $this->requestHttpCode,
-                'message' => $except->getMessage()
+            $output = [
+                'itunes_id'      => $response['search']->results[0]->collectionId,
+                'title'          => (string) utf8_decode($feed->channel->title),
+                'description'    => (string) utf8_decode($feed->channel->description),
+                'image'          => (string) $feed->channel->image->url,
+                'links'          => [
+                    'site'   => (string) $feed->channel->link,
+                    'rss'    => $response['search']->results[0]->feedUrl,
+                    'itunes' => $response['search']->results[0]->collectionViewUrl
+                ],
+                'genre'          => $response['search']->results[0]->primaryGenreName,
+                'language'       => (string) $feed->channel->language,
+                'episodes_total' => (int) count($feed->channel->item)
             ];
 
-            return $response;
-        }
+            foreach($feed->channel->item as $value) {
+                $published_at = new DateTime($value->pubDate);
+                $published_at = $published_at->format('Y-m-d');
 
-        libxml_use_internal_errors(true);
-
-        try {
-            $feed = new SimpleXMLElement($download_feed, LIBXML_NOCDATA, false);
+                $output['episodes'][] = [
+                    'title'        => (string) utf8_decode($value->title),
+                    'mp3'          => isset($value->enclosure) ? (string) $value->enclosure->attributes()->url : null,
+                    'description'  => (string) utf8_decode($value->description),
+                    'link'         => (string) $value->link,
+                    'published_at' => $published_at,
+                ];
+            }
         } catch (Exception $except) {
-            $download_feed = $this->repairXml($download_feed);
-            $feed          = new SimpleXMLElement($download_feed, LIBXML_NOCDATA, false);
-        }
-
-        $response = [
-            'itunes_id'   => $item->collectionId,
-            'title'       => (string) $feed->channel->title,
-            'description' => (string) $feed->channel->description,
-            'image'       => (string) $feed->channel->image->url,
-            'links'       => [
-                'site'   => (string) $feed->channel->link,
-                'rss'    => $item->feedUrl,
-                'itunes' => $item->collectionViewUrl
-            ],
-            'genre'       => $item->primaryGenreName,
-            'language'    => (string) $feed->channel->language,
-            'episodes'    => (int) count($feed->channel->item)
-        ];
-
-        foreach($feed->channel->item as $entry) {
-            $published_at = new DateTime($entry->pubDate);
-            $published_at = $published_at->format('Y-m-d');
-
-            $response['mp3'][] = [
-                'title'        => (string) $entry->title,
-                'mp3'          => isset($entry->enclosure) ? (string) $entry->enclosure->attributes()->url : null,
-                'description'  => (string) $entry->description,
-                'link'         => (string) $entry->link,
-                'published_at' => $published_at,
+            $output = [
+                'status_code' => $except->getCode(),
+                'message'     => $except->getMessage()
             ];
         }
 
-        return $response;
+        return $output;
     }
 
     /**
-     * Return the http status code
-     * @return int
+     * Get podcasts RSS sought by Collection ID
+     * @param int $id The podcast id
+     * @return array
      */
-    public function getStatusCode()
+    private function getRss($id)
     {
-        return $this->requestHttpCode;
-    }
+        $response = $this->getSearch($id);
 
-    /**
-     * Repair a XML string with failures in structure
-     * @param string $xml XML string
-     * @return string XML repaired
-     */
-    private function repairXml($xml)
-    {
-        $config = [
-            'indent'     => true,
-            'input-xml'  => true,
-            'output-xml' => true,
-            'wrap'       => false
+        if (!isset($response['search']->results[0], $response['search']->results[0]->feedUrl)) {
+            throw new Exception("Data response by Itunes are inconsistent", $response['status_code']);
+        }
+
+        // Request the RSS
+        $Request = new Request;
+        $rss_url = $response['search']->results[0]->feedUrl;
+        $output  = $Request->request($rss_url);
+
+        if (is_null($output)) {
+            throw new Exception("Request to RSS failed", $Request->getStatusCode());
+        }
+
+        $output = [
+            'feed'        => $output,
+            'search'      => $response['search'],
+            'status_code' => $Request->getStatusCode(),
         ];
 
-        $xml_repaired = new Tidy();
-        $xml_repaired->ParseString($xml, $config, 'utf8');
-        $xml_repaired->cleanRepair();
-
-        return $xml_repaired;
-    }
-
-    /**
-     * Send a http request and return the response
-     * @param string $url
-     * @param array $options CURL options
-     * @return string
-     */
-    private function request($url, array $options = [])
-    {
-        $ch = curl_init($url);
-
-        $default_options = [
-            CURLOPT_FAILONERROR    => true,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => 15,
-            CURLOPT_SSL_VERIFYPEER => 0,
-            CURLINFO_HEADER_OUT    => true
-        ] + $options;
-
-        curl_setopt_array($ch, $default_options);
-
-        $result = curl_exec($ch);
-        $this->requestHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        return $result;
+        return $output;
     }
 }
