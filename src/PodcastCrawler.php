@@ -93,8 +93,9 @@ class PodcastCrawler
     private function getSearch($value)
     {
         $Request  = new Request;
+        $value    = is_string($value) ? urlencode($value) : $value;
         $url      = is_int($value) ? self::LOOKUP_URL . "?id={$value}" : self::SEARCH_URL . "?term={$value}";
-        $url      = urldecode($url . '&' . $this->defaultQuery);
+        $url      = $url . '&' . $this->defaultQuery;
         $response = $Request->request($url);
 
         if (is_null($response)) {
