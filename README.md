@@ -67,12 +67,6 @@ Description: Collection ID of the podcast
 
 Return: `array`
 
-#### $PodcastCrawler->getStatusCode()
-
-Description: Return the HTTP status code
-
-Return: `int`
-
 ## License
 
 Podcast Crawler is open-sourced software licensed under the MIT License (MIT). Please see [LICENSE](/LICENSE.md) for more information.
