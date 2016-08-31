@@ -1,4 +1,12 @@
 <?php
+/**
+ *  This file is part of the Podcast Crawler package.
+ *
+ *  Copyright (c) 2016 Dorian Neto
+ *
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
+ */
 
 namespace PodcastCrawler;
 
@@ -8,34 +16,49 @@ use SimpleXMLElement;
 use DateTime;
 use Exception;
 
+/**
+ * Class Podcastcrawler\Podcastcrawler enables the search for podcasts to get details and mp3 files through Itunes API
+ *
+ * @version v0.15.1-beta
+ * @link https://github.com/podcastcrawler/podcastcrawler
+ * @license https://github.com/podcastcrawler/podcastcrawler/blob/master/LICENSE.md MIT
+ * @copyright 2016 Podcast Crawler
+ * @author Dorian Neto <doriansampaioneto@gmail.com>
+ */
 class PodcastCrawler
 {
     /**
+     * Base url to search by keyword
      * @var string SEARCH_URL
      */
     const SEARCH_URL = "https://itunes.apple.com/search";
 
     /**
+     * Base url to search by Collection ID
      * @var string LOOKUP_URL
      */
     const LOOKUP_URL = "https://itunes.apple.com/lookup";
 
     /**
-     * @var int LIMIT The number of search results you want the iTunes Store to return
+     * The number of search results you want the iTunes Store to return
+     * @var int LIMIT
      */
     const LIMIT = 15;
 
     /**
-     * @var string ENTITY The type of results you want returned, relative to the specified media type
+     * The type of results you want returned, relative to the specified media type
+     * @var string ENTITY
      */
     const ENTITY = "podcast";
 
     /**
-     * @var string MEDIA The media type you want to search for
+     * The media type you want to search for
+     * @var string MEDIA
      */
     const MEDIA = "podcast";
 
     /**
+     * Array with default query string values to implement in selected base url
      * @var string $defaultQuery
      */
     private $defaultQuery = null;
@@ -54,7 +77,7 @@ class PodcastCrawler
 
     /**
      * Returns the podcasts
-     * @param string|int $value The text or ID
+     * @param string|int $value The keyword or ID
      * @return array
      */
     public function search($value)
@@ -86,8 +109,8 @@ class PodcastCrawler
     }
 
     /**
-     * Get podcasts sought by the term or Collection ID
-     * @param string|int $value The URL-encoded text string or ID int you want to search for
+     * Get podcasts sought by the keyword or Collection ID
+     * @param string|int $value The URL-encoded keyword or ID int you want to search for
      * @return array
      */
     private function getSearch($value)
@@ -112,7 +135,7 @@ class PodcastCrawler
 
     /**
      * Returns the podcast details
-     * @param int $id The podcast id
+     * @param int $id The podcast ID
      * @return array
      */
     public function feed($id)
