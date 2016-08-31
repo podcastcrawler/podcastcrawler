@@ -5,7 +5,7 @@
 [![Packagist](https://img.shields.io/packagist/dt/podcastcrawler/podcastcrawler.svg?maxAge=2592000)](https://packagist.org/packages/podcastcrawler/podcastcrawler)
 [![Packagist](https://img.shields.io/packagist/l/podcastcrawler/podcastcrawler.svg?maxAge=2592000)](https://packagist.org/packages/podcastcrawler/podcastcrawler)
 
-Podcast Crawler it is a library that enables the search for podcasts to get details and mp3 files through Itunes API.
+Podcast Crawler is a library that enables the search for podcasts to get details and mp3 files through Itunes API.
 
 ## Highlights
 
@@ -44,7 +44,7 @@ use PodcastCrawler\PodcastCrawler;
 
 $PodcastCrawler = new PodcastCrawler();
 
-$searchByTerm = $PodcastCrawler->search('nerdcast');
+$searchByTerm = $PodcastCrawler->get('nerdcast');
 var_dump($searchByTerm); // return array with search result
 
 $getFeed = $PodcastCrawler->feed('381816509');

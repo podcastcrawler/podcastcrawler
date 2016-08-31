@@ -3,10 +3,10 @@
 namespace PodcastCrawler\Tests;
 
 use PodcastCrawler\Tests\PodcastCrawlerBaseTest as Base;
-use PodcastCrawler\Helper;
+use PodcastCrawler\Xml;
 use DOMDocument;
 
-class HelperTest extends Base
+class XmlTest extends Base
 {
     /**
      * Test the repair of the a dirty xml string
@@ -15,7 +15,7 @@ class HelperTest extends Base
     {
         $clean_xml    = '<?xml version="1.0"?><catalog><book><title>XML Developer</title></book></catalog>';
         $dirty_xml    = '<catalog><book><title>XML Developer</title>';
-        $repaired_xml = Helper::repairXml($dirty_xml);
+        $repaired_xml = Xml::repair($dirty_xml);
 
         $expected = new DOMDocument();
         $expected->loadXML($clean_xml);

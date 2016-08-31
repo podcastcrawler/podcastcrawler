@@ -5,14 +5,16 @@ namespace PodcastCrawler;
 use Tidy;
 use Exception;
 
-class Helper
+class Xml
 {
     /**
      * Repair a XML string with failures in structure
+     *
      * @param string $xml XML string
      * @return string XML repaired
+     * @throws Exception
      */
-    public static function repairXml($xml)
+    public static function repair($xml)
     {
         if (class_exists("Tidy") === false) {
             throw new Exception("Tidy Class not found", 500);
@@ -26,7 +28,7 @@ class Helper
         ];
 
         $xml_repaired = new Tidy();
-        $xml_repaired->ParseString($xml, $config, 'utf8');
+        $xml_repaired->parseString($xml, $config, 'utf8');
         $xml_repaired->cleanRepair();
 
         return $xml_repaired;
