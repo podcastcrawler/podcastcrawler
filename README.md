@@ -53,19 +53,7 @@ var_dump($getFeed); // return array with podcast details and mp3 files
 
 ## API
 
-### Methods
-
-#### $PodcastCrawler->search(string|int $value)
-
-Description: Values like `jovem nerd`, `naoouvo`, `criscast` or collection ID of the podcast
-
-Return: `array`
-
-#### $PodcastCrawler->feed(int $id)
-
-Description: Collection ID of the podcast
-
-Return: `array`
+See the full API through this [link](http://api.podcastcrawler.com/v0.15.1-beta/index.html)
 
 ## License
 
