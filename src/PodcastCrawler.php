@@ -120,7 +120,7 @@ class PodcastCrawler
         $value    = is_string($value) ? urlencode($value) : $value;
         $url      = is_int($value) ? self::LOOKUP_URL . "?id={$value}" : self::SEARCH_URL . "?term={$value}";
         $url      = $url . '&' . $this->defaultQuery;
-        $response = $Request->request($url);
+        $response = $Request->create($url);
 
         if (is_null($response)) {
             throw new Exception("Request to Itunes API failed", $Request->getStatusCode());
@@ -140,10 +140,10 @@ class PodcastCrawler
      * @param int $id The podcast ID
      * @return array
      */
-    public function feed($id)
+    public function find($id)
     {
         try {
-            $response = $this->getRss($id);
+            $response = $this->feed($id);
 
             libxml_use_internal_errors(true);
 
@@ -198,7 +198,7 @@ class PodcastCrawler
      * @return array
      * @throws Exception
      */
-    private function getRss($id)
+    private function feed($id)
     {
         $response = $this->search($id);
 
@@ -209,7 +209,7 @@ class PodcastCrawler
         // Request the RSS
         $Request = new Request;
         $rss_url = $response['search']->results[0]->feedUrl;
-        $output  = $Request->request($rss_url);
+        $output  = $Request->create($rss_url);
 
         if (is_null($output)) {
             throw new Exception("Request to RSS failed", $Request->getStatusCode());
