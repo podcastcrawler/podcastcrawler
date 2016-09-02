@@ -10,8 +10,6 @@
 
 namespace PodcastCrawler;
 
-use PodcastCrawler\Request;
-use PodcastCrawler\Helper;
 use SimpleXMLElement;
 use DateTime;
 use Exception;
@@ -64,7 +62,7 @@ class PodcastCrawler
     private $defaultQuery = null;
 
     /**
-     * @return void
+     * @return PodcastCrawler
      */
     public function __construct()
     {
@@ -77,13 +75,14 @@ class PodcastCrawler
 
     /**
      * Returns the podcasts
-     * @param string|int $value The keyword or ID
+     *
+     * @param string|int $value A keyword or an ID
      * @return array
      */
-    public function search($value)
+    public function get($value)
     {
         try {
-            $response = $this->getSearch($value);
+            $response = $this->search($value);
             $output['result_count'] = $response['search']->resultCount;
 
             foreach($response['search']->results as $value) {
@@ -109,11 +108,13 @@ class PodcastCrawler
     }
 
     /**
-     * Get podcasts sought by the keyword or Collection ID
+     * Get podcasts sought by the term or the Collection ID
+     *
      * @param string|int $value The URL-encoded keyword or ID int you want to search for
      * @return array
+     * @throws Exception
      */
-    private function getSearch($value)
+    private function search($value)
     {
         $Request  = new Request;
         $value    = is_string($value) ? urlencode($value) : $value;
@@ -135,6 +136,7 @@ class PodcastCrawler
 
     /**
      * Returns the podcast details
+     *
      * @param int $id The podcast ID
      * @return array
      */
@@ -148,7 +150,7 @@ class PodcastCrawler
             try {
                 $feed = new SimpleXMLElement($response['feed'], LIBXML_NOCDATA, false);
             } catch (Exception $except) {
-                $response_repaired = Helper::repairXml($response['feed']);
+                $response_repaired = Xml::repair($response['feed']);
                 $feed              = new SimpleXMLElement($response_repaired, LIBXML_NOCDATA, false);
             }
 
@@ -191,12 +193,14 @@ class PodcastCrawler
 
     /**
      * Get podcasts RSS sought by Collection ID
+     *
      * @param int $id The podcast id
      * @return array
+     * @throws Exception
      */
     private function getRss($id)
     {
-        $response = $this->getSearch($id);
+        $response = $this->search($id);
 
         if (!isset($response['search']->results[0], $response['search']->results[0]->feedUrl)) {
             throw new Exception("Data response by Itunes are inconsistent", $response['status_code']);

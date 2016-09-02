@@ -19,7 +19,7 @@ abstract class PodcastCrawlerBaseTest extends PHPUnit
     /**
      * @var string SEARCH_URL
      */
-    const SEARCH_URL = 'https://itunes.apple.com/search?term=jovemlimit=15&entity=podcast&media=podcast';
+    const SEARCH_URL = 'https://itunes.apple.com/search?term=jovem&limit=15&entity=podcast&media=podcast';
 
     /**
      * @var string LOOKUP_URL

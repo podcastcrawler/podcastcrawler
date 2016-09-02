@@ -26,7 +26,7 @@ class PodcastCrawlerTest extends Base
     public function testSearch($value = null)
     {
         $value  = empty($value) ? self::TERM : $value;
-        $result = $this->instance->search($value);
+        $result = $this->instance->get($value);
 
         $this->assertInternalType('array', $result);
         $this->assertArrayHasKey('result_count', $result);
@@ -39,7 +39,7 @@ class PodcastCrawlerTest extends Base
     public function testSearchValues($value = null)
     {
         $value  = empty($value) ? self::TERM : $value;
-        $result = $this->instance->search($value);
+        $result = $this->instance->get($value);
 
         foreach ($result['podcasts'] as $podcast) {
             $this->assertArrayHasKey('itunes_id', $podcast);
