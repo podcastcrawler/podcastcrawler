@@ -170,7 +170,8 @@ class PodcastCrawler
             ];
 
             foreach($feed->channel->item as $value) {
-                $published_at = new DateTime($value->pubDate);
+                $published_at = new DateTime();
+                $published_at->setTimestamp(strtotime($value->pubDate));
                 $published_at = $published_at->format('Y-m-d');
 
                 $output['episodes'][] = [

@@ -45,7 +45,7 @@ $PodcastCrawler = new PodcastCrawler();
 $searchByTerm = $PodcastCrawler->get('nerdcast');
 var_dump($searchByTerm); // return array with search result
 
-$getFeed = $PodcastCrawler->find('381816509');
+$getFeed = $PodcastCrawler->find(381816509);
 var_dump($getFeed); // return array with podcast details and mp3 files
 ```
 
