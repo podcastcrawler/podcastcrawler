@@ -73,7 +73,7 @@ class PodcastCrawlerTest extends Base
      */
     public function testFeed()
     {
-        $result = $this->instance->feed(self::ID);
+        $result = $this->instance->find(self::ID);
 
         $this->assertInternalType('array', $result);
         $this->assertArrayHasKey('itunes_id', $result);
@@ -97,7 +97,7 @@ class PodcastCrawlerTest extends Base
      */
     public function testFeedValues()
     {
-        $result = $this->instance->feed(self::ID);
+        $result = $this->instance->find(self::ID);
 
         foreach ($result['episodes'] as $episode) {
             $this->assertArrayHasKey('title', $episode);

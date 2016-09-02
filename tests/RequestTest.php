@@ -26,7 +26,7 @@ class RequestTest extends Base
     public function testRequestSearchUrl($value = null)
     {
         $value   = empty($value) ? self::SEARCH_URL : $value;
-        $request = $this->instance->request($value);
+        $request = $this->instance->create($value);
 
         $this->assertNotEmpty($request);
         $this->assertInternalType('string', $request);
