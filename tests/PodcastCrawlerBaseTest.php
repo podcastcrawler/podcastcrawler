@@ -9,12 +9,12 @@ abstract class PodcastCrawlerBaseTest extends PHPUnit
     /**
      * @var string TERM
      */
-    const TERM = 'jovem';
+    const TERM = 'jovem nerd';
 
     /**
      * @var int ID
      */
-    const ID = 381816509;
+    const ID = 1103141552;
 
     /**
      * @var string SEARCH_URL
@@ -24,7 +24,7 @@ abstract class PodcastCrawlerBaseTest extends PHPUnit
     /**
      * @var string LOOKUP_URL
      */
-    const LOOKUP_URL = 'https://itunes.apple.com/lookup?id=381816509&limit=15&entity=podcast&media=podcast';
+    const LOOKUP_URL = 'https://itunes.apple.com/lookup?id=1103141552&limit=15&entity=podcast&media=podcast';
 
     /**
      * @var string RSS_URL
