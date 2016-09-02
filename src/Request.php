@@ -28,12 +28,13 @@ class Request
     private $statusCode = null;
 
     /**
-     * Makes a HTTP request
-     * @param string $url URL to be requested
+     * Creates a Request based on a given URI and configuration
+     *
+     * @param string $url URI to be requested
      * @param array $options CURL options
      * @return string
      */
-    public function request($url, array $options = [])
+    public function create($url, array $options = [])
     {
         $request = curl_init($url);
 
@@ -57,6 +58,7 @@ class Request
 
     /**
      * Returns the HTTP status code
+     *
      * @return int
      */
     public function getStatusCode()
