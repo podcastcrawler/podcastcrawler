@@ -14,7 +14,7 @@ use Tidy;
 use Exception;
 
 /**
- * Class Podcastcrawler\Helper
+ * Class Podcastcrawler\Xml
  *
  * @version v0.15.1-beta
  * @link https://github.com/podcastcrawler/podcastcrawler
@@ -22,14 +22,16 @@ use Exception;
  * @copyright 2016 Podcast Crawler
  * @author Dorian Neto <doriansampaioneto@gmail.com>
  */
-class Helper
+class Xml
 {
     /**
      * Repair a XML string with failures in structure
+     *
      * @param string $xml XML string
      * @return string XML repaired
+     * @throws Exception
      */
-    public static function repairXml($xml)
+    public static function repair($xml)
     {
         if (class_exists("Tidy") === false) {
             throw new Exception("Tidy Class not found", 500);
@@ -43,7 +45,7 @@ class Helper
         ];
 
         $xml_repaired = new Tidy();
-        $xml_repaired->ParseString($xml, $config, 'utf8');
+        $xml_repaired->parseString($xml, $config, 'utf8');
         $xml_repaired->cleanRepair();
 
         return $xml_repaired;

@@ -1,5 +1,9 @@
-vendor/
+/vendor/
 composer.lock
 
 # ApiGen
 api/
+
+# OS generated files
+.DS_Store
+.idea
