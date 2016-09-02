@@ -23,7 +23,6 @@ Podcast Crawler is verified and tested on PHP 5.4, 5.5, 5.6 and 7.0.
 
 It's necessary have installed [Tidy](http://php.net/manual/pt_BR/book.tidy.php) library.
 
-
 ## Installation
 
 Install `podcastcrawler/podcastcrawler` using Composer:
@@ -31,7 +30,6 @@ Install `podcastcrawler/podcastcrawler` using Composer:
 ```
 $ composer require podcastcrawler/podcastcrawler
 ```
-
 
 ## Basic Usage
 
@@ -47,13 +45,13 @@ $PodcastCrawler = new PodcastCrawler();
 $searchByTerm = $PodcastCrawler->get('nerdcast');
 var_dump($searchByTerm); // return array with search result
 
-$getFeed = $PodcastCrawler->feed('381816509');
+$getFeed = $PodcastCrawler->find('381816509');
 var_dump($getFeed); // return array with podcast details and mp3 files
 ```
 
 ## API
 
-See the full API through this [link](http://api.podcastcrawler.com/v0.15.1-beta/index.html)
+See the full API through this [link](http://api.podcastcrawler.com/v0.15.1-beta/index.html).
 
 ## License
 
