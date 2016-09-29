@@ -13,16 +13,24 @@ namespace PodcastCrawler;
 /**
  * Class Podcastcrawler\Request
  *
- * @version v0.15.1-beta
- * @link https://github.com/podcastcrawler/podcastcrawler
- * @license https://github.com/podcastcrawler/podcastcrawler/blob/master/LICENSE.md MIT
+ * @version   v1.0.0
+ * @link      https://github.com/podcastcrawler/podcastcrawler
+ * @license   https://github.com/podcastcrawler/podcastcrawler/blob/master/LICENSE.md MIT
  * @copyright 2016 Podcast Crawler
- * @author Dorian Neto <doriansampaioneto@gmail.com>
+ * @author    Dorian Neto <doriansampaioneto@gmail.com>
  */
 class Request
 {
     /**
      * Status code of the HTTP request
+     *
+     * @var int $statusCode
+     */
+    private $contentType = null;
+
+    /**
+     * Status code of the HTTP request
+     *
      * @var int $statusCode
      */
     private $statusCode = null;
@@ -30,8 +38,8 @@ class Request
     /**
      * Creates a Request based on a given URI and configuration
      *
-     * @param string $url URI to be requested
-     * @param array $options CURL options
+     * @param  string $url     URI to be requested
+     * @param  array  $options CURL options
      * @return string
      */
     public function create($url, array $options = [])
@@ -51,6 +59,7 @@ class Request
 
         $result = curl_exec($request);
         $this->statusCode = curl_getinfo($request, CURLINFO_HTTP_CODE);
+        $this->contentType = curl_getinfo($request, CURLINFO_CONTENT_TYPE);
         curl_close($request);
 
         return $result;
@@ -64,5 +73,15 @@ class Request
     public function getStatusCode()
     {
         return $this->statusCode;
+    }
+
+    /**
+     * Returns the HTTP content type
+     *
+     * @return string
+     */
+    public function getContentType()
+    {
+        return $this->contentType;
     }
 }

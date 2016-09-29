@@ -16,20 +16,20 @@ use Exception;
 /**
  * Class Podcastcrawler\Xml
  *
- * @version v0.15.1-beta
- * @link https://github.com/podcastcrawler/podcastcrawler
- * @license https://github.com/podcastcrawler/podcastcrawler/blob/master/LICENSE.md MIT
+ * @version   v0.15.1-beta
+ * @link      https://github.com/podcastcrawler/podcastcrawler
+ * @license   https://github.com/podcastcrawler/podcastcrawler/blob/master/LICENSE.md MIT
  * @copyright 2016 Podcast Crawler
- * @author Dorian Neto <doriansampaioneto@gmail.com>
+ * @author    Dorian Neto <doriansampaioneto@gmail.com>
  */
 class Xml
 {
     /**
      * Repair a XML string with failures in structure
      *
-     * @param string $xml XML string
-     * @return string XML repaired
-     * @throws Exception
+     * @param  string $xml XML string
+     * @return string      XML repaired
+     * @throws             Exception
      */
     public static function repair($xml)
     {

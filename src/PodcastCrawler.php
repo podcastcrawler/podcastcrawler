@@ -11,92 +11,47 @@
 namespace PodcastCrawler;
 
 use SimpleXMLElement;
-use DateTime;
 use Exception;
 
 /**
- * Class Podcastcrawler\Podcastcrawler enables the search for podcasts to get details and mp3 files through Itunes API
+ * Class Podcastcrawler\Podcastcrawler enables the search for podcasts to get details and mp3 files through many API
  *
- * @version v0.15.1-beta
- * @link https://github.com/podcastcrawler/podcastcrawler
- * @license https://github.com/podcastcrawler/podcastcrawler/blob/master/LICENSE.md MIT
+ * @version   v1.0.0
+ * @link      https://github.com/podcastcrawler/podcastcrawler
+ * @license   https://github.com/podcastcrawler/podcastcrawler/blob/master/LICENSE.md MIT
  * @copyright 2016 Podcast Crawler
- * @author Dorian Neto <doriansampaioneto@gmail.com>
+ * @author    Dorian Neto <doriansampaioneto@gmail.com>
  */
 class PodcastCrawler
 {
     /**
-     * Base url to search by keyword
-     * @var string SEARCH_URL
+     * The provider
+     *
+     * @var ProviderInterface
      */
-    const SEARCH_URL = "https://itunes.apple.com/search";
+    private $provider;
 
     /**
-     * Base url to search by Collection ID
-     * @var string LOOKUP_URL
+     * The construct of the object
+     *
+     * @param ProviderInterface $provider
      */
-    const LOOKUP_URL = "https://itunes.apple.com/lookup";
-
-    /**
-     * The number of search results you want the iTunes Store to return
-     * @var int LIMIT
-     */
-    const LIMIT = 15;
-
-    /**
-     * The type of results you want returned, relative to the specified media type
-     * @var string ENTITY
-     */
-    const ENTITY = "podcast";
-
-    /**
-     * The media type you want to search for
-     * @var string MEDIA
-     */
-    const MEDIA = "podcast";
-
-    /**
-     * Array with default query string values to implement in selected base url
-     * @var string $defaultQuery
-     */
-    private $defaultQuery = null;
-
-    /**
-     * @return PodcastCrawler
-     */
-    public function __construct()
+    public function __construct(ProviderInterface $provider)
     {
-        $this->defaultQuery = http_build_query([
-            'limit'     => self::LIMIT,
-            'entity'    => self::ENTITY,
-            'media'     => self::MEDIA
-        ]);
+        $this->provider = $provider;
     }
 
     /**
      * Returns the podcasts
      *
-     * @param string|int $value A keyword or an ID
+     * @param  string $value The keyword
      * @return array
      */
     public function get($value)
     {
         try {
-            $response = $this->search($value);
-            $output['result_count'] = $response['search']->resultCount;
-
-            foreach($response['search']->results as $value) {
-                $output['podcasts'][] = [
-                    'itunes_id' => $value->collectionId,
-                    'author'    => utf8_decode($value->artistName),
-                    'title'     => utf8_decode($value->collectionName),
-                    'episodes'  => $value->trackCount,
-                    'image'     => $value->artworkUrl100,
-                    'rss'       => $value->feedUrl,
-                    'itunes'    => $value->collectionViewUrl,
-                    'genre'     => $value->primaryGenreName,
-                ];
-            }
+            $response = $this->search(new Request, $value);
+            $output   = $this->provider->build($response);
         } catch (Exception $except) {
             $output = [
                 'status_code' => $except->getCode(),
@@ -108,27 +63,24 @@ class PodcastCrawler
     }
 
     /**
-     * Get podcasts sought by the term or the Collection ID
+     * Get podcasts sought by the term
      *
-     * @param string|int $value The URL-encoded keyword or ID int you want to search for
+     * @param  Request $request The Request object
+     * @param  string  $value   The URL-encoded keyword you want to search for
      * @return array
      * @throws Exception
      */
-    private function search($value)
+    private function search(Request $request, $value)
     {
-        $Request  = new Request;
-        $value    = is_string($value) ? urlencode($value) : $value;
-        $url      = is_int($value) ? self::LOOKUP_URL . "?id={$value}" : self::SEARCH_URL . "?term={$value}";
-        $url      = $url . '&' . $this->defaultQuery;
-        $response = $Request->create($url);
+        $response = $request->create($this->provider->generateUrl($value));
 
         if (is_null($response)) {
-            throw new Exception("Request to Itunes API failed", $Request->getStatusCode());
+            throw new Exception("Request to Itunes API failed", $request->getStatusCode());
         }
 
         $output = [
-            'search'      => json_decode($response),
-            'status_code' => $Request->getStatusCode(),
+            'search'      => $response,
+            'status_code' => $request->getStatusCode(),
         ];
 
         return $output;
@@ -137,13 +89,13 @@ class PodcastCrawler
     /**
      * Returns the podcast details
      *
-     * @param int $id The podcast ID
+     * @param  string $feedUrl The podcast feed URL
      * @return array
      */
-    public function find($id)
+    public function find($feedUrl)
     {
         try {
-            $response = $this->feed($id);
+            $response = $this->read(new Request, $feedUrl);
 
             libxml_use_internal_errors(true);
 
@@ -154,34 +106,7 @@ class PodcastCrawler
                 $feed              = new SimpleXMLElement($response_repaired, LIBXML_NOCDATA, false);
             }
 
-            $output = [
-                'itunes_id'      => $response['search']->results[0]->collectionId,
-                'title'          => (string) utf8_decode($feed->channel->title),
-                'description'    => (string) utf8_decode($feed->channel->description),
-                'image'          => (string) $feed->channel->image->url,
-                'links'          => [
-                    'site'   => (string) $feed->channel->link,
-                    'rss'    => $response['search']->results[0]->feedUrl,
-                    'itunes' => $response['search']->results[0]->collectionViewUrl
-                ],
-                'genre'          => $response['search']->results[0]->primaryGenreName,
-                'language'       => (string) $feed->channel->language,
-                'episodes_total' => (int) count($feed->channel->item)
-            ];
-
-            foreach($feed->channel->item as $value) {
-                $published_at = new DateTime();
-                $published_at->setTimestamp(strtotime($value->pubDate));
-                $published_at = $published_at->format('Y-m-d');
-
-                $output['episodes'][] = [
-                    'title'        => (string) utf8_decode($value->title),
-                    'mp3'          => isset($value->enclosure) ? (string) $value->enclosure->attributes()->url : null,
-                    'description'  => (string) utf8_decode($value->description),
-                    'link'         => (string) $value->link,
-                    'published_at' => $published_at,
-                ];
-            }
+            $output = $this->provider->buildFeed($feed);
         } catch (Exception $except) {
             $output = [
                 'status_code' => $except->getCode(),
@@ -193,33 +118,24 @@ class PodcastCrawler
     }
 
     /**
-     * Get podcasts RSS sought by Collection ID
+     * Get podcasts RSS sought by feed URL
      *
-     * @param int $id The podcast id
+     * @param  Request $request The Request object
+     * @param  string  $feedUrl The podcast feed URL
      * @return array
      * @throws Exception
      */
-    private function feed($id)
+    private function read(Request $request, $feedUrl)
     {
-        $response = $this->search($id);
-
-        if (!isset($response['search']->results[0], $response['search']->results[0]->feedUrl)) {
-            throw new Exception("Data response by Itunes are inconsistent", $response['status_code']);
-        }
-
-        // Request the RSS
-        $Request = new Request;
-        $rss_url = $response['search']->results[0]->feedUrl;
-        $output  = $Request->create($rss_url);
+        $output = $request->create($feedUrl);
 
         if (is_null($output)) {
-            throw new Exception("Request to RSS failed", $Request->getStatusCode());
+            throw new Exception("Request to RSS failed", $request->getStatusCode());
         }
 
         $output = [
             'feed'        => $output,
-            'search'      => $response['search'],
-            'status_code' => $Request->getStatusCode(),
+            'status_code' => $request->getStatusCode(),
         ];
 
         return $output;

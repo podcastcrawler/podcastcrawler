@@ -31,14 +31,7 @@ class RequestTest extends Base
         $this->assertNotEmpty($request);
         $this->assertInternalType('string', $request);
         $this->assertEquals(200, $this->instance->getStatusCode());
-    }
-
-    /**
-     * Test the request from url LOOKUP
-     */
-    public function testRequestLookupUrl()
-    {
-        $this->testRequestSearchUrl(self::LOOKUP_URL);
+        $this->assertNotEmpty($this->instance->getContentType());
     }
 
     /**
