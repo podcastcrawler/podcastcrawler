@@ -21,7 +21,7 @@ Podcast Crawler is a library that enables the search for podcasts to get details
 * Fully documented
 * Fully unit tested
 * Search for podcasts by Term
-* Serach podcasts on multiple APIs
+* Search podcasts on multiple APIs
 * Get details and mp3 files through from Collection ID
 
 ### System Requirements
@@ -60,7 +60,7 @@ var_dump($getFeed); // Returns an array with the podcast's detail and episodes w
 
 ### API
 
-See the full API through this [link](http://api.podcastcrawler.com/v0.15.1-beta/index.html).
+See the full API through this [link](http://api.podcastcrawler.com/v1/).
 
 ### License
 
