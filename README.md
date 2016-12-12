@@ -56,8 +56,11 @@ $PodcastCrawler = new PodcastCrawler($provider);
 $PodcastCrawler->get('nerdcast');
 //=> Returns an array with search result (result count and a list with podcasts)
 
+$PodcastCrawler->limit(1)->get('a');
+//=> Returns an array with 1 (one) item. Result count is also included.
+
 $PodcastCrawler->find(381816509);
-// Returns an array with the podcast's detail and episodes with its mp3 files.
+//=> Returns an array with the podcast's detail and episodes with its mp3 files.
 ```
 
 ### API
