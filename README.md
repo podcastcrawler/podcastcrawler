@@ -48,14 +48,16 @@ $ composer require podcastcrawler/podcastcrawler
 require 'vendor/autoload.php';
 
 use PodcastCrawler\PodcastCrawler;
+use PodcastCrawler\Provider\Itunes;
 
-$PodcastCrawler = new PodcastCrawler();
+$provider = new Itunes();
+$PodcastCrawler = new PodcastCrawler($provider);
 
-$searchByTerm = $PodcastCrawler->get('nerdcast');
-var_dump($searchByTerm); // Returns an array with search result (result count and a list with podcasts)
+$PodcastCrawler->get('nerdcast');
+//=> Returns an array with search result (result count and a list with podcasts)
 
-$getFeed = $PodcastCrawler->find(381816509);
-var_dump($getFeed); // Returns an array with the podcast's detail and episodes with its mp3 files.
+$PodcastCrawler->find(381816509);
+// Returns an array with the podcast's detail and episodes with its mp3 files.
 ```
 
 ### API
