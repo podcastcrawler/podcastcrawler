@@ -41,18 +41,18 @@ class DigitalPodcast extends AbstractProvider implements ProviderInterface
     const SEARCH_URL = "http://api.digitalpodcast.com/v2r/search";
 
     /**
-     * The number of results to return
-     *
-     * @var int
-     */
-    const RESULTS = 15;
-
-    /**
      * Specifies the kind of format the podcast search service produces
      *
      * @var string
      */
     const FORMAT = "rss";
+
+    /**
+     * The number of results to return
+     *
+     * @var int
+     */
+    private $limit = 15;
 
     /**
      * Array with default query string values to implement in base url
@@ -66,9 +66,35 @@ class DigitalPodcast extends AbstractProvider implements ProviderInterface
      */
     public function __construct()
     {
+        $this->setDefaultQuery();
+    }
+
+    /**
+     * Returns the limit for search
+     *
+     * @return int
+     */
+    public function getLimit() {
+        return $this->limit;
+    }
+
+    /**
+     * Set the limit for search
+     *
+     * @param int $limit The limit
+     */
+    public function setLimit($limit) {
+        // `-1` being used here because the API returns 3 items when `results=2`.
+        $this->limit = ((int) $limit - 1);
+    }
+
+    /**
+     * Set default URL query for search
+     */
+    public function setDefaultQuery() {
         $this->defaultQuery = http_build_query([
+            'results' => $this->limit,
             'appid'   => self::APP_ID,
-            'results' => self::RESULTS,
             'format'  => self::FORMAT
         ]);
     }

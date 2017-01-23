@@ -27,6 +27,14 @@ class DigitalPodcastProviderTest extends Base
         $this->instance = new PodcastCrawler($this->providerInstance);
     }
 
+    public function testLimit() {
+        $limit = 14;
+
+        $this->providerInstance->setLimit($limit);
+
+        $this->assertEquals($limit, $this->providerInstance->getLimit() + 1);
+    }
+
     public function testDigitalPodcastBuild()
     {
         $result = $this->instance->get(self::TERM);
