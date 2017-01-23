@@ -78,7 +78,8 @@ class Itunes extends AbstractProvider implements ProviderInterface
      *
      * @return int
      */
-    public function getLimit() {
+    public function getLimit()
+    {
         return $this->limit;
     }
 
@@ -87,14 +88,16 @@ class Itunes extends AbstractProvider implements ProviderInterface
      *
      * @param int $limit The limit
      */
-    public function setLimit($limit) {
+    public function setLimit($limit)
+    {
         $this->limit = (int) $limit;
     }
 
     /**
      * Set default URL query for search
      */
-    public function setDefaultQuery() {
+    public function setDefaultQuery()
+    {
         $this->defaultQuery = http_build_query([
             'limit'     => $this->limit,
             'entity'    => self::ENTITY,

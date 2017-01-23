@@ -25,7 +25,6 @@ use SimpleXMLElement;
  */
 class DigitalPodcast extends AbstractProvider implements ProviderInterface
 {
-
     /**
      * The Application ID
      *
@@ -74,7 +73,8 @@ class DigitalPodcast extends AbstractProvider implements ProviderInterface
      *
      * @return int
      */
-    public function getLimit() {
+    public function getLimit()
+    {
         return $this->limit;
     }
 
@@ -83,7 +83,8 @@ class DigitalPodcast extends AbstractProvider implements ProviderInterface
      *
      * @param int $limit The limit
      */
-    public function setLimit($limit) {
+    public function setLimit($limit)
+    {
         // `-1` being used here because the API returns 3 items when `results=2`.
         $this->limit = ((int) $limit - 1);
     }
@@ -91,7 +92,8 @@ class DigitalPodcast extends AbstractProvider implements ProviderInterface
     /**
      * Set default URL query for search
      */
-    public function setDefaultQuery() {
+    public function setDefaultQuery()
+    {
         $this->defaultQuery = http_build_query([
             'results' => $this->limit,
             'appid'   => self::APP_ID,
