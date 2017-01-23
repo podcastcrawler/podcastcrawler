@@ -32,6 +32,21 @@ class PodcastCrawlerTest extends Base
     }
 
     /**
+     * Test to validate the return of the search sought by the term with a specified limit
+     */
+    public function testGetWithLimit()
+    {
+        $limit  = 2;
+        $search = 'a';
+
+        $result = $this->instance->limit($limit)->get($search);
+
+        $this->assertInternalType('array', $result);
+        $this->assertEquals($limit, $result['result_count']);
+        $this->assertEquals($limit, count($result));
+    }
+
+    /**
      * Test to validate the return of the feed sought by RSS URL
      */
     public function testFind()

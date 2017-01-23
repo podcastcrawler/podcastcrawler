@@ -27,6 +27,14 @@ class ItunesProviderTest extends Base
         $this->instance = new PodcastCrawler($this->providerInstance);
     }
 
+    public function testLimit() {
+        $limit = 10;
+
+        $this->providerInstance->setLimit($limit);
+
+        $this->assertEquals($limit, $this->providerInstance->getLimit());
+    }
+
     public function testItunesBuild()
     {
         $result = $this->instance->get(self::TERM);

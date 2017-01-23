@@ -53,11 +53,14 @@ use PodcastCrawler\Provider\Itunes;
 
 $PodcastCrawler = new PodcastCrawler(new Itunes);
 
-$searchByTerm = $PodcastCrawler->get('nerdcast');
-var_dump($searchByTerm); // Returns an array with search result (result count and a list with podcasts)
+$PodcastCrawler->get('nerdcast');
+// Returns an array with search result (result count and a list with podcasts).
 
-$getFeed = $PodcastCrawler->find('https://jovemnerd.com.br/feed-nerdcast/');
-var_dump($getFeed); // Returns an array with the podcast's detail and episodes with its mp3 files.
+$PodcastCrawler->limit(2)->get('dev');
+// Returns an array with 2 (two) items. Result count is also included.
+
+$PodcastCrawler->find('https://jovemnerd.com.br/feed-nerdcast/');
+// Returns an array with the podcast's detail and episodes with its mp3 files.
 ```
 
 ### API

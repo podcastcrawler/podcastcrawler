@@ -14,7 +14,7 @@ use SimpleXMLElement;
 use Exception;
 
 /**
- * Class Podcastcrawler\Podcastcrawler enables the search for podcasts to get details and mp3 files through many API
+ * Class Podcastcrawler\Podcastcrawler enables the search for podcasts to get details and mp3 files through many APIs
  *
  * @version   v1.0.0
  * @link      https://github.com/podcastcrawler/podcastcrawler
@@ -78,12 +78,10 @@ class PodcastCrawler
             throw new Exception("Request to Itunes API failed", $request->getStatusCode());
         }
 
-        $output = [
+        return [
             'search'      => $response,
             'status_code' => $request->getStatusCode(),
         ];
-
-        return $output;
     }
 
     /**
@@ -106,15 +104,20 @@ class PodcastCrawler
                 $feed              = new SimpleXMLElement($response_repaired, LIBXML_NOCDATA, false);
             }
 
-            $output = $this->provider->buildFeed($feed);
+            return $this->provider->buildFeed($feed);
         } catch (Exception $except) {
-            $output = [
+            return [
                 'status_code' => $except->getCode(),
                 'message'     => $except->getMessage()
             ];
         }
+    }
 
-        return $output;
+    public function limit($limit) {
+        $this->provider->setLimit($limit);
+        $this->provider->setDefaultQuery();
+
+        return $this;
     }
 
     /**
@@ -133,11 +136,9 @@ class PodcastCrawler
             throw new Exception("Request to RSS failed", $request->getStatusCode());
         }
 
-        $output = [
+        return [
             'feed'        => $output,
             'status_code' => $request->getStatusCode(),
         ];
-
-        return $output;
     }
 }

@@ -38,13 +38,6 @@ class Itunes extends AbstractProvider implements ProviderInterface
     const LOOKUP_URL = "https://itunes.apple.com/lookup";
 
     /**
-     * The number of search results you want the iTunes Store to return
-     *
-     * @var int
-     */
-    const LIMIT = 15;
-
-    /**
      * The type of results you want returned, relative to the specified media type
      *
      * @var string
@@ -59,6 +52,13 @@ class Itunes extends AbstractProvider implements ProviderInterface
     const MEDIA = "podcast";
 
     /**
+     * The number of search results you want the iTunes Store to return
+     *
+     * @var int
+     */
+    private $limit = 15;
+
+    /**
      * Array with default query string values to implement in selected base url
      *
      * @var string
@@ -70,8 +70,33 @@ class Itunes extends AbstractProvider implements ProviderInterface
      */
     public function __construct()
     {
+        $this->setDefaultQuery();
+    }
+
+    /**
+     * Returns the limit for search
+     *
+     * @return int
+     */
+    public function getLimit() {
+        return $this->limit;
+    }
+
+    /**
+     * Set the limit for search
+     *
+     * @param int $limit The limit
+     */
+    public function setLimit($limit) {
+        $this->limit = (int) $limit;
+    }
+
+    /**
+     * Set default URL query for search
+     */
+    public function setDefaultQuery() {
         $this->defaultQuery = http_build_query([
-            'limit'     => self::LIMIT,
+            'limit'     => $this->limit,
             'entity'    => self::ENTITY,
             'media'     => self::MEDIA
         ]);
