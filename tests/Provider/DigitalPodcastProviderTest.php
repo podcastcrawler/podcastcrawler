@@ -24,7 +24,7 @@ class DigitalPodcastProviderTest extends Base
     public function setUp()
     {
         $this->providerInstance = new DigitalPodcast();
-        $this->instance = new PodcastCrawler($this->providerInstance);
+        $this->instance         = new PodcastCrawler($this->providerInstance);
     }
 
     public function testLimit() {
