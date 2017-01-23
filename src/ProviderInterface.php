@@ -36,4 +36,23 @@ interface ProviderInterface
      * @return array
      */
     public function build(array $response);
+
+    /**
+     * Set default URL query for search
+     */
+    public function setDefaultQuery();
+
+    /**
+     * Returns the limit for search
+     *
+     * @return int
+     */
+    public function getLimit();
+
+    /**
+     * Set the limit for search
+     *
+     * @param int $limit The limit
+     */
+    public function setLimit($limit);
 }
