@@ -113,7 +113,13 @@ class PodcastCrawler
         }
     }
 
-    public function limit($limit) {
+    /**
+     * Set a limit to search
+     * @param  int    $limit
+     * @return PodcastCrawler\PodcastCrawler
+     */
+    public function limit($limit)
+    {
         $this->provider->setLimit($limit);
         $this->provider->setDefaultQuery();
 
