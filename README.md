@@ -13,9 +13,10 @@ Podcast Crawler is a library that enables the search for podcasts to get details
 - [Installation](#installation)
 - [Basic Usage](#basic-usage)
 - [API](#api)
+- [Contribuing](#contribuing)
 - [License](#license)
 
-### Highlights
+## Highlights
 
 * Simple API
 * Fully documented
@@ -63,6 +64,12 @@ var_dump($getFeed); // Returns an array with the podcast's detail and episodes w
 
 See the full API through this [link](http://api.podcastcrawler.com/v1/).
 
+### Contribuing
+
+We are so excited that you want contribute with the project! Follow these [recommendations](/CONTRIBUTING.md).
+
 ### License
 
 Podcast Crawler is open-sourced software licensed under the MIT License (MIT). Please see [LICENSE](/LICENSE.md) for more information.
+
+Designed with :heart: by [Dorian Neto](https://github.com/dorianneto)
