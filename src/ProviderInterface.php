@@ -13,7 +13,7 @@ namespace PodcastCrawler;
 /**
  * Interface Podcastcrawler\ProviderInterface
  *
- * @version   v1.0.0
+ * @version   v1.1.0
  * @link      https://github.com/podcastcrawler/podcastcrawler
  * @license   https://github.com/podcastcrawler/podcastcrawler/blob/master/LICENSE.md MIT
  * @copyright 2016 Podcast Crawler

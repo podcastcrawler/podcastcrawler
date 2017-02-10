@@ -65,7 +65,7 @@ $PodcastCrawler->find('https://jovemnerd.com.br/feed-nerdcast/');
 
 ### API
 
-See the full API through this [link](http://api.podcastcrawler.com/v1/).
+See the full API through this [link](http://api.podcastcrawler.com/v1.1/).
 
 ### Contribuing
 

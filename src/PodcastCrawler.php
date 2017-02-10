@@ -16,7 +16,7 @@ use Exception;
 /**
  * Class Podcastcrawler\Podcastcrawler enables the search for podcasts to get details and mp3 files through many APIs
  *
- * @version   v1.0.0
+ * @version   v1.1.0
  * @link      https://github.com/podcastcrawler/podcastcrawler
  * @license   https://github.com/podcastcrawler/podcastcrawler/blob/master/LICENSE.md MIT
  * @copyright 2016 Podcast Crawler
