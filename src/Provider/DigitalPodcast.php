@@ -130,7 +130,7 @@ class DigitalPodcast extends AbstractProvider implements ProviderInterface
 
         foreach($xml->item as $value) {
             $output['podcasts'][] = [
-                'title' => utf8_decode($value->title),
+                'title' => $value->title,
                 'rss'   => (string) $value->source,
                 'link'  => (string) $value->link,
             ];

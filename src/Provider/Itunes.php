@@ -133,8 +133,8 @@ class Itunes extends AbstractProvider implements ProviderInterface
         foreach($response->results as $value) {
             $output['podcasts'][] = [
                 'itunes_id' => $value->collectionId,
-                'author'    => utf8_decode($value->artistName),
-                'title'     => utf8_decode($value->collectionName),
+                'author'    => $value->artistName,
+                'title'     => $value->collectionName,
                 'episodes'  => $value->trackCount,
                 'image'     => $value->artworkUrl100,
                 'rss'       => $value->feedUrl,

@@ -33,8 +33,8 @@ abstract class AbstractProvider
     public function buildFeed(SimpleXMLElement $feed)
     {
         $output = [
-            'title'          => (string) utf8_decode($feed->channel->title),
-            'description'    => (string) utf8_decode($feed->channel->description),
+            'title'          => (string) $feed->channel->title,
+            'description'    => (string) $feed->channel->description,
             'image'          => (string) $feed->channel->image->url,
             'site'           => (string) $feed->channel->link,
             'language'       => (string) $feed->channel->language,
@@ -47,9 +47,9 @@ abstract class AbstractProvider
             $published_at = $published_at->format('Y-m-d');
 
             $output['episodes'][] = [
-                'title'        => (string) utf8_decode($value->title),
+                'title'        => (string) $value->title,
                 'mp3'          => isset($value->enclosure) ? (string) $value->enclosure->attributes()->url : null,
-                'description'  => (string) utf8_decode($value->description),
+                'description'  => (string) $value->description,
                 'link'         => (string) $value->link,
                 'published_at' => $published_at,
             ];
