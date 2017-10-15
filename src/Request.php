@@ -36,6 +36,20 @@ class Request
     private $statusCode = null;
 
     /**
+     * Curl error code
+     *
+     * @var int $errorCode
+     */
+    private $errorCode = null;
+
+    /**
+     * Curl error
+     *
+     * @var string $error
+     */
+    private $error = null;
+
+    /**
      * Creates a Request based on a given URI and configuration
      *
      * @param  string $url     URI to be requested
@@ -58,6 +72,10 @@ class Request
         curl_setopt_array($request, $default_options);
 
         $result = curl_exec($request);
+        if ($result === false) {
+            $this->errorCode = curl_errno($request);
+            $this->error = curl_error($request);
+        }
         $this->statusCode = curl_getinfo($request, CURLINFO_HTTP_CODE);
         $this->contentType = curl_getinfo($request, CURLINFO_CONTENT_TYPE);
         curl_close($request);
@@ -83,5 +101,25 @@ class Request
     public function getContentType()
     {
         return $this->contentType;
+    }
+
+    /**
+     * Returns the Curl error code
+     *
+     * @return int
+     */
+    public function getCurlErrorCode()
+    {
+        return $this->errorCode;
+    }
+
+    /**
+     * Returns the Curl error
+     *
+     * @return string
+     */
+    public function getCurlError()
+    {
+        return $this->error;
     }
 }
