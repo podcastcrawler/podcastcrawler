@@ -82,9 +82,19 @@ class PodcastCrawler
      */
     private function search(Request $request, $value)
     {
-        $response = $request->create($this->provider->generateUrl($value));
+        $url = $this->provider->generateUrl($value);
+        $response = $request->create($url);
 
         if (is_null($response)) {
+            $this->logger->error(
+                "Error occured while attempting to connect to the provider",
+                [
+                    "provider"  =>  get_class($this->provider),
+                    "url"       =>  $url,
+                    "errorCode" =>  $request->getCurlErrorCode(),
+                    "error"     =>  $request->getCurlError()
+                ]
+            );
             throw new Exception("Request to Itunes API failed", $request->getStatusCode());
         }
 
@@ -149,6 +159,14 @@ class PodcastCrawler
         $output = $request->create($feedUrl);
 
         if (is_null($output)) {
+            $this->logger->error(
+                "Error occured while attempting to request the RSS feed",
+                [
+                    "url"       =>  $feedUrl,
+                    "errorCode" =>  $request->getCurlErrorCode(),
+                    "error"     =>  $request->getCurlError()
+                ]
+            );
             throw new Exception("Request to RSS failed", $request->getStatusCode());
         }
 
