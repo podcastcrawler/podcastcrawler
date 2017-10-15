@@ -24,7 +24,10 @@ class ItunesProviderTest extends Base
     public function setUp()
     {
         $this->providerInstance = new Itunes();
-        $this->instance         = new PodcastCrawler($this->providerInstance);
+        $this->instance         = new PodcastCrawler(
+            $this->providerInstance,
+            $this->getMockBuilder("\\Psr\\Log\\LoggerInterface")->getMock()
+        );
     }
 
     public function testLimit() {

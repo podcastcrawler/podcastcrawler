@@ -18,7 +18,10 @@ class PodcastCrawlerTest extends Base
      */
     public function setUp()
     {
-        $this->instance = new PodcastCrawler(new Itunes());
+        $this->instance = new PodcastCrawler(
+            new Itunes(),
+            $this->getMockBuilder("\\Psr\\Log\\LoggerInterface")->getMock()
+        );
     }
 
     /**
