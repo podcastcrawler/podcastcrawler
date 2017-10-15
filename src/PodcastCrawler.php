@@ -12,6 +12,7 @@ namespace PodcastCrawler;
 
 use SimpleXMLElement;
 use Exception;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Podcastcrawler\Podcastcrawler enables the search for podcasts to get details and mp3 files through many APIs
@@ -32,13 +33,22 @@ class PodcastCrawler
     private $provider;
 
     /**
+     * Logger
+     *
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
      * The construct of the object
      *
      * @param ProviderInterface $provider
+     * @param \Psr\Log\LoggerInterface $logger
      */
-    public function __construct(ProviderInterface $provider)
+    public function __construct(ProviderInterface $provider, LoggerInterface $logger)
     {
         $this->provider = $provider;
+        $this->logger = $logger;
     }
 
     /**
